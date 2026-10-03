@@ -1,0 +1,22 @@
+# Confidential Bare Metal: Dev (working-tree) navigation. Release versions are
+# listed by hand in fern/docs.yml.
+
+navigation:
+  - section: Confidential Bare Metal
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/bare-metal/index.mdx
+        slug: ""
+      - page: Deployment Guide
+        path: ../../pages/bare-metal/deployment-guide.mdx
+        slug: deployment-guide
+      - page: Reference Architecture
+        path: ../../pages/bare-metal/reference-architecture.mdx
+        slug: reference-architecture
+      - page: Playbooks
+        path: ../../pages/bare-metal/playbooks.mdx
+        slug: playbooks
+      - page: Performance
+        path: ../../pages/bare-metal/performance.mdx
+        slug: performance
