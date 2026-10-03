@@ -1,0 +1,49 @@
+# Landing product: Dev navigation for the overview, concepts, and shared
+# guides (former "Platform Guides"). Product-specific material lives in the
+# bare-metal, cvm, and containers products, each with its own version list.
+
+navigation:
+  - section: Confidential Computing
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/overview/index.mdx
+        slug: ""
+      - page: Positioning
+        path: ../../pages/overview/positioning.mdx
+        slug: positioning
+      - page: Threat Model Comparison
+        path: ../../pages/overview/threat-model-comparison.mdx
+        slug: threat-model
+      - page: Hopper and Blackwell CC Capabilities
+        path: ../../pages/overview/hopper-blackwell-capabilities.mdx
+        slug: gpu-capabilities
+
+  - section: Deployment Models
+    slug: ""
+    contents:
+      - link: Confidential Bare Metal
+        href: /confidential-computing/bare-metal
+        icon: fa-solid fa-server
+      - link: Confidential Virtual Machine
+        href: /confidential-computing/cvm
+        icon: fa-solid fa-cube
+      - link: Confidential Containers
+        href: /confidential-computing/containers
+        icon: fa-solid fa-cubes
+
+  - section: Guides
+    slug: guides
+    contents:
+      - page: Overview
+        path: ../../pages/platform/index.mdx
+        slug: ""
+      - page: Attestation
+        path: ../../pages/platform/attestation.mdx
+        slug: attestation
+      - page: Verifier
+        path: ../../pages/platform/verifier.mdx
+        slug: verifier
+      - page: Compatibility Matrix
+        path: ../../pages/platform/compatibility-matrix.mdx
+        slug: compatibility-matrix

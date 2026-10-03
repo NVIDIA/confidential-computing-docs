@@ -1,0 +1,22 @@
+# Confidential Containers: Dev (working-tree) navigation. Release versions are
+# listed by hand in fern/docs.yml.
+
+navigation:
+  - section: Confidential Containers
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/containers/index.mdx
+        slug: ""
+      - page: Deployment Guide
+        path: ../../pages/containers/deployment-guide.mdx
+        slug: deployment-guide
+      - page: Reference Architecture
+        path: ../../pages/containers/reference-architecture.mdx
+        slug: reference-architecture
+      - page: Playbooks
+        path: ../../pages/containers/playbooks.mdx
+        slug: playbooks
+      - page: Performance
+        path: ../../pages/containers/performance.mdx
+        slug: performance

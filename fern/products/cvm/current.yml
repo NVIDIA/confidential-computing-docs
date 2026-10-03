@@ -1,0 +1,22 @@
+# Confidential Virtual Machine: Dev (working-tree) navigation. Release versions are
+# listed by hand in fern/docs.yml.
+
+navigation:
+  - section: Confidential Virtual Machine
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/cvm/index.mdx
+        slug: ""
+      - page: Deployment Guide
+        path: ../../pages/cvm/deployment-guide.mdx
+        slug: deployment-guide
+      - page: Reference Architecture
+        path: ../../pages/cvm/reference-architecture.mdx
+        slug: reference-architecture
+      - page: Playbooks
+        path: ../../pages/cvm/playbooks.mdx
+        slug: playbooks
+      - page: Performance
+        path: ../../pages/cvm/performance.mdx
+        slug: performance
