@@ -1,0 +1,169 @@
+---
+title: "Managing the Confidential Computing Mode"
+license: Apache-2.0
+copyright: "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved."
+description: "As a Kubernetes Cluster Administrator, use this page to configure the confidential computing mode of NVIDIA GPUs in your cluster."
+---
+
+<Anchor id="managing-confidential-computing-mode"></Anchor>
+
+As a [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-cluster-administrator), use this page to configure the confidential computing mode of NVIDIA GPUs in your cluster.
+
+After installing the NVIDIA GPU Operator, you can use the GPU Operator to configure the confidential computing mode of the NVIDIA GPUs in your cluster.
+You can set a cluster-wide default Confidential Computing mode, and you can set the mode on individual nodes.
+
+<Note>
+Enabling Confidential Computing mode configures the GPU hardware boundary.
+It does not by itself cryptographically verify the confidential environment or release secrets to a workload.
+Confidentiality is established by attestation.
+Refer to [Attestation](./attestation.mdx).
+
+</Note>
+
+Set the cluster-wide default mode using the `ccManager.defaultMode=<on|off>` option.
+The default value of `ccManager.defaultMode` is `on`.
+Set a node-level mode by applying the `nvidia.com/cc.mode=<on|off|ppcie>` label on the node.
+If you set a specific mode on a node, it has higher precedence than the cluster-wide default mode.
+
+The supported modes are:
+
+| Mode | Description | Configuration Method |
+| --- | --- | --- |
+| <code>on</code> (default) | Enable Confidential Computing. | cluster-wide default, node-level override |
+| <code>off</code> | Disable Confidential Computing. | cluster-wide default, node-level override |
+| <code>ppcie</code> | Enable Confidential Computing on NVIDIA Hopper GPUs. On the NVIDIA Hopper architecture, [multi-GPU passthrough](./configure-workloads.mdx#coco-multi-gpu-passthrough) uses protected PCIe (PPCIE), which claims exclusive use of the NVSwitches for a single Confidential Container virtual machine. If you use NVIDIA Hopper GPUs for multi-GPU passthrough, set the mode to <code>ppcie</code>. The NVIDIA Blackwell architecture uses NVLink encryption, which places the switches outside of the Trusted Computing Base (TCB), so <code>ppcie</code> mode is not required. Use <code>on</code> mode for Blackwell. | node-level override |
+
+When you change the mode, the manager performs the following actions:
+
+- Evicts the other GPU Operator operands from the node.
+However, the manager does not drain user workloads. You must make sure that no user workloads are running on the node before you change the mode.
+
+- Changes the mode and resets the GPU.
+
+- Reschedules the other GPU Operator operands.
+
+## Setting a Cluster-Wide Default Mode
+
+<Note>
+Before changing the mode, make sure that no user workloads are running on the node.
+
+</Note>
+
+To set a cluster-wide mode, specify the `ccManager.defaultMode` field like the following example:
+
+```console
+kubectl patch clusterpolicies.nvidia.com/cluster-policy \
+      --type=merge \
+      -p '{"spec": {"ccManager": {"defaultMode": "on"}}}'
+```
+
+*Example Output:*
+
+```output
+clusterpolicy.nvidia.com/cluster-policy patched
+```
+
+<Note>
+The `ppcie` mode cannot be set as a cluster-wide default, it can only be set as a node label value.
+
+</Note>
+
+## Setting a Node-Level Mode
+
+To set a node-level mode, apply the `nvidia.com/cc.mode=<on|off|ppcie>` label on the node.
+
+Set the `NODE_NAME` environment variable to the name of the node you want to configure:
+
+```console
+export NODE_NAME="<node-name>"
+```
+
+Then apply the label:
+
+```console
+kubectl label node $NODE_NAME nvidia.com/cc.mode=on --overwrite
+```
+
+*Example Output:*
+
+```output
+node/<node-name> labeled
+```
+
+For NVIDIA Hopper GPUs used in [multi-GPU passthrough](./configure-workloads.mdx#coco-multi-gpu-passthrough), set `ppcie` instead of `on`:
+
+```console
+kubectl label node $NODE_NAME nvidia.com/cc.mode=ppcie --overwrite
+```
+
+The mode that you set on a node has higher precedence than the cluster-wide default mode.
+
+## Verifying a Mode Change
+
+To verify that a mode change was successful, view the `nvidia.com/cc.mode`,
+`nvidia.com/cc.mode.state`, and `nvidia.com/cc.ready.state` node labels:
+
+```console
+kubectl get node $NODE_NAME -o json | \
+    jq '.metadata.labels | with_entries(select(.key | startswith("nvidia.com/cc")))'
+```
+
+*Example Output (CC mode disabled):*
+
+```json
+{
+  "nvidia.com/cc.mode": "off",
+  "nvidia.com/cc.mode.state": "off",
+  "nvidia.com/cc.ready.state": "false"
+}
+```
+
+*Example Output (CC mode enabled):*
+
+```json
+{
+  "nvidia.com/cc.mode": "on",
+  "nvidia.com/cc.mode.state": "on",
+  "nvidia.com/cc.ready.state": "true"
+}
+```
+
+To wait for an enable transition (`on` or `ppcie`) to finish instead of polling the labels by hand, block until the node reports ready:
+
+```console
+until [ "$(kubectl get node $NODE_NAME -o jsonpath='{.metadata.labels.nvidia\.com/cc\.ready\.state}')" = "true" ]; do echo "waiting for CC mode to converge..."; sleep 5; done; echo "Node $NODE_NAME is ready for Confidential Containers"
+```
+
+*Example Output:*
+
+```output
+waiting for CC mode to converge...
+waiting for CC mode to converge...
+Node <node-name> is ready for Confidential Containers
+```
+
+The loop exits when `nvidia.com/cc.ready.state` becomes `true`, which the Confidential Computing Manager sets after the mode transition completes for `on` or `ppcie`.
+
+When you disable CC mode after enabling it, wait one to two minutes for
+`nvidia.com/cc.mode.state` and `nvidia.com/cc.ready.state` to match the desired `off` state.
+A mode change is complete and successful when `nvidia.com/cc.mode` and
+`nvidia.com/cc.mode.state` have the same value.
+
+If `nvidia.com/cc.mode.state` does not match `nvidia.com/cc.mode`, refer to [nvidia.com/cc.mode.state Not Matching nvidia.com/cc.mode](./troubleshooting.mdx#coco-cc-mode-troubleshoot) in the troubleshooting guide.
+If `nvidia.com/cc.mode.state` is `failed`, refer to [nvidia.com/cc.mode.state is failed](./troubleshooting.mdx#coco-cc-mode-failed).
+
+## Understanding Confidential Computing Mode Labels
+
+The following labels are used to manage the Confidential Computing mode on a node.
+You only need to update the `nvidia.com/cc.mode` label, the other labels are managed by the Confidential Computing Manager to represent the current state of the Confidential Computing mode on the node.
+
+| Label Name | Label Values | Details |
+| --- | --- | --- |
+| <code>nvidia.com/cc.mode</code> | <code>on</code>, <code>off</code>, <code>ppcie</code> | The desired Confidential Computing mode. You update this node label to trigger a mode change. |
+| <code>nvidia.com/cc.mode.state</code> | <code>on</code>, <code>off</code>, <code>ppcie</code>, <code>failed</code> | Reflects the mode that was last successfully applied to the GPU hardware by the Confidential Computing Manager. Its value mirrors the applied mode after the transition is complete on the node. A value of <code>failed</code> indicates that the last mode transition encountered an error. |
+| <code>nvidia.com/cc.ready.state</code> | <code>true</code>, <code>false</code> | Indicates whether the node is ready to run Confidential Container workloads. Set to <code>true</code> when <code>cc.mode.state</code> is <code>on</code> or <code>ppcie</code>, and <code>false</code> when <code>cc.mode.state</code> is <code>off</code>. |
+
+<Note>
+The `ppcie` mode is only supported on NVIDIA Hopper GPUs.
+
+</Note>

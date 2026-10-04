@@ -2,21 +2,57 @@
 # listed by hand in fern/docs.yml.
 
 navigation:
-  - section: Confidential Containers
+  - page: Overview
+    path: ../../pages/containers/index.mdx
     slug: ""
+  - section: Learn
+    skip-slug: true
     contents:
-      - page: Overview
-        path: ../../pages/containers/index.mdx
-        slug: ""
-      - page: Deployment Guide
-        path: ../../pages/containers/deployment-guide.mdx
-        slug: deployment-guide
       - page: Reference Architecture
-        path: ../../pages/containers/reference-architecture.mdx
-        slug: reference-architecture
-      - page: Playbooks
-        path: ../../pages/containers/playbooks.mdx
-        slug: playbooks
-      - page: Performance
-        path: ../../pages/containers/performance.mdx
-        slug: performance
+        path: ../../pages/containers/overview.mdx
+        slug: overview
+      - page: Personas
+        path: ../../pages/containers/personas.mdx
+        slug: personas
+      - page: Supported Platforms
+        path: ../../pages/containers/supported-platforms.mdx
+        slug: supported-platforms
+  - section: Install
+    skip-slug: true
+    contents:
+      - page: Prerequisites
+        path: ../../pages/containers/prerequisites.mdx
+        slug: prerequisites
+      - page: Quickstart Install
+        path: ../../pages/containers/install-quickstart.mdx
+        slug: install-quickstart
+      - page: Detailed Install Guide
+        path: ../../pages/containers/confidential-containers-deploy.mdx
+        slug: confidential-containers-deploy
+      - page: Run a Sample Workload
+        path: ../../pages/containers/run-sample-workload.mdx
+        slug: run-sample-workload
+  - section: Configuration
+    skip-slug: true
+    contents:
+      - page: Configuring Workloads
+        path: ../../pages/containers/configure-workloads.mdx
+        slug: configure-workloads
+      - page: Managing the Confidential Computing Mode
+        path: ../../pages/containers/configure-cc-mode.mdx
+        slug: configure-cc-mode
+      - page: Attestation
+        path: ../../pages/containers/attestation.mdx
+        slug: attestation
+  - section: Reference
+    skip-slug: true
+    contents:
+      - page: Troubleshooting
+        path: ../../pages/containers/troubleshooting.mdx
+        slug: troubleshooting
+      - page: Release Notes
+        path: ../../pages/containers/release-notes.mdx
+        slug: release-notes
+      - page: Licensing
+        path: ../../pages/containers/licensing.mdx
+        slug: licensing

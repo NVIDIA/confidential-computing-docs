@@ -1,0 +1,193 @@
+---
+title: "Quickstart Install"
+license: Apache-2.0
+copyright: "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved."
+description: "As a Kubernetes Cluster Administrator, use these steps to install Kata Containers and the NVIDIA GPU Operator with minimal steps."
+---
+
+<Anchor id="coco-install-quickstart"></Anchor>
+
+As a [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-cluster-administrator), use these steps to install Kata Containers and the NVIDIA GPU Operator with minimal steps.
+For additional configuration options and install details, refer to the [Detailed Install Guide](./confidential-containers-deploy.mdx).
+
+This quickstart will configure every node in your cluster for Confidential Containers workloads.
+This is ideal for evaluation or dedicated Confidential Containers clusters.
+If you need to run Confidential Containers on only some nodes while keeping traditional GPU workloads on others, or you want more control over the installation, use the [Label Nodes for Confidential Containers Components](./confidential-containers-deploy.mdx#coco-label-nodes) section in the [Detailed Install Guide](./confidential-containers-deploy.mdx).
+
+This quickstart takes approximately 10 minutes to complete.
+
+<Note>
+Before starting, make sure your cluster meets the [Prerequisites](./prerequisites.mdx).
+
+</Note>
+
+## What You Will Build
+
+By the end of this quickstart, you will have:
+
+- Kata Containers running on your cluster.
+
+- The NVIDIA GPU Operator installed and configured for Confidential Containers.
+
+- All cluster nodes configured for Confidential Containers workloads.
+
+<Anchor id="quickstart-install-kata"></Anchor>
+
+### Install the Kata Containers Helm Chart
+
+1. Set the chart version and registry path:
+
+   ```console
+   export VERSION="3.29.0"
+   export CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
+   ```
+
+1. Install the `kata-deploy` Helm chart:
+
+   ```console
+   helm install kata-deploy "${CHART}" \
+      --namespace kata-system --create-namespace \
+      --set nfd.enabled=false \
+      --wait --timeout 10m \
+      --version "${VERSION}"
+   ```
+
+   *Example Output:*
+
+   ```output
+   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:3.29.0
+   Digest: sha256:aea41018779716ce2e0bf406d701637d10fb5a0792db51a08dfd3f76701eb933
+   LAST DEPLOYED: Wed Apr  1 17:03:00 2026
+   NAMESPACE: kata-system
+   STATUS: deployed
+   REVISION: 1
+   DESCRIPTION: Install complete
+   TEST SUITE: None
+   ```
+
+   It can take 2 to 3 minutes for the command to return and all output to be printed.
+
+   <Note>
+   There is a [known Helm issue](https://github.com/helm/helm/issues/8660) on single-node clusters that may result in the Helm command finishing before all pods are done initializing.
+If you are deploying to a single-node cluster, wait a few additional minutes after the command completes.
+
+   </Note>
+
+1. Verify that the `kata-deploy` pod is running:
+
+   ```console
+   kubectl get pods -n kata-system | grep kata-deploy
+   ```
+
+   *Example Output:*
+
+   ```output
+   kata-deploy-b2lzs       1/1     Running   0             6m37s
+   ```
+
+   A `READY` value of `1/1` and a `STATUS` of `Running` mean the `kata-deploy` pod installed the Kata components on the node.
+If the pod does not reach `Running`, refer to [View Kata Containers Logs](./troubleshooting.mdx#coco-view-kata-logs) in [Troubleshooting](./troubleshooting.mdx).
+
+1. Verify the `kata-qemu-nvidia-gpu-snp` and `kata-qemu-nvidia-gpu-tdx` runtime classes are available:
+
+   After `helm install` completes, the `kata-deploy` chart creates the Kata `RuntimeClass` resources on the cluster.
+This usually happens within 1-2 minutes after the `kata-deploy` pod reaches `Running`.
+Confirm SNP and TDX classes are present before you continue to [Install the NVIDIA GPU Operator](#quickstart-install-gpu-operator).
+
+   ```console
+   kubectl get runtimeclass | grep kata-qemu-nvidia-gpu
+   ```
+
+   *Example Output:*
+
+   ```output
+   NAME                       HANDLER                    AGE
+   kata-qemu-nvidia-gpu       kata-qemu-nvidia-gpu       40s
+   kata-qemu-nvidia-gpu-snp   kata-qemu-nvidia-gpu-snp   40s
+   kata-qemu-nvidia-gpu-tdx   kata-qemu-nvidia-gpu-tdx   40s
+   ```
+
+   If the SNP and TDX runtime classes are not listed immediately, the chart may still be initializing rather than failing.
+Wait 1-2 minutes and re-run the command.
+If they are still missing after the `kata-deploy` pod reports `Running`, the install did not complete correctly.
+On a single-node cluster, retry after a few minutes only if Helm returned before the `kata-deploy` pod reaches `Running` (refer to the note above).
+Otherwise, refer to [Troubleshooting](./troubleshooting.mdx).
+
+**Success criteria:** Helm reports `STATUS: deployed` and both SNP and TDX runtime classes appear in the output above.
+
+<Anchor id="quickstart-install-gpu-operator"></Anchor>
+
+### Install the NVIDIA GPU Operator
+
+1. Add and update the NVIDIA Helm repository:
+
+   ```console
+   helm repo add nvidia https://helm.ngc.nvidia.com/nvidia \
+      && helm repo update
+   ```
+
+   *Example Output:*
+
+   ```output
+   "nvidia" has been added to your repositories
+   Hang tight while we grab the latest from your chart repositories...
+   ...Successfully got an update from the "nvidia" chart repository
+   Update Complete. ⎈Happy Helming!⎈
+   ```
+
+1. Install the GPU Operator configured for Confidential Containers on all nodes:
+
+   ```console
+   helm install --wait --timeout 10m --generate-name \
+      -n gpu-operator --create-namespace \
+      nvidia/gpu-operator \
+      --set sandboxWorkloads.enabled=true \
+      --set sandboxWorkloads.defaultWorkload=vm-passthrough \
+      --set sandboxWorkloads.mode=kata \
+      --set nfd.enabled=true \
+      --set nfd.nodefeaturerules=true \
+      --version=v26.3.1
+   ```
+
+   *Example Output:*
+
+   ```output
+   NAME: gpu-operator
+   LAST DEPLOYED: Tue Mar 10 17:58:12 2026
+   NAMESPACE: gpu-operator
+   STATUS: deployed
+   REVISION: 1
+   TEST SUITE: None
+   ```
+
+   It may take 3 to 5 minutes for the Helm release to complete and for all GPU Operator pods to reach the Running state.
+
+   The `sandboxWorkloads.defaultWorkload=vm-passthrough` flag in the Helm install command sets the default cluster workload type for Confidential Containers.
+
+1. Verify that all GPU Operator pods are running:
+
+   ```console
+   kubectl get pods -n gpu-operator
+   ```
+
+   *Example Output:*
+
+   ```output
+   NAME                                                              READY   STATUS    RESTARTS   AGE
+   gpu-operator-1766001809-node-feature-discovery-gc-75776475sxzkp   1/1     Running   0          86s
+   gpu-operator-1766001809-node-feature-discovery-master-6869lxq2g   1/1     Running   0          86s
+   gpu-operator-1766001809-node-feature-discovery-worker-mh4cv       1/1     Running   0          86s
+   gpu-operator-f48fd66b-vtfrl                                       1/1     Running   0          86s
+   nvidia-cc-manager-7z74t                                           1/1     Running   0          61s
+   nvidia-kata-sandbox-device-plugin-daemonset-d5rvg                 1/1     Running   0          30s
+   nvidia-sandbox-validator-6xnzc                                    1/1     Running   0          30s
+   nvidia-vfio-manager-h229x                                         1/1     Running   0          62s
+   ```
+
+**Success criteria:** All GPU Operator pods are `Running` or `Completed`.
+
+Your cluster is now configured to deploy GPU workloads into the SNP and TDX runtime classes on all nodes.
+
+### Next Steps
+
+- Continue to [Run a Sample Workload](./run-sample-workload.mdx) to confirm the deployment.
