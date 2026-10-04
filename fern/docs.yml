@@ -1,5 +1,7 @@
 instances:
-  - url: nvidia.docs.buildwithfern.com/confidential-computing
+  - url: nvidia-confidential-computing.docs.buildwithfern.com/confidential-computing
+    custom-domain: docs.nvidia.com/confidential-computing
+    multi-source: true
 
 title: NVIDIA Confidential Computing
 
