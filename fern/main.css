@@ -71,3 +71,11 @@
     text-transform: uppercase;
     opacity: 0.7;
 }
+
+
+/* Theme-specific images (converted from Sphinx :class: only-light / only-dark). */
+
+.dark .only-light,
+:root:not(.dark) .only-dark {
+    display: none !important;
+}
