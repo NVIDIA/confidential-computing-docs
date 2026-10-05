@@ -1,9 +1,183 @@
 ---
-title: "Positioning"
-description: "How NVIDIA Confidential Computing fits alongside CPU-based confidential computing and other data-protection approaches."
+title: "Confidential Computing Modes"
+description: "Choose an NVIDIA Confidential Computing mode, Confidential Bare Metal, Confidential Virtual Machines, or Confidential Containers, by who manages the host and what the trust boundary must exclude."
+template-library-version: "1.0.0"
 sidebar-title: "Positioning"
 ---
 
-<Note>
-This page is in development.
-</Note>
+NVIDIA Confidential Computing protects data in use on GPU infrastructure through three modes: Confidential Bare Metal (CBM), Confidential Virtual Machines (CVM), and Confidential Containers. Each mode has a different trust boundary, so choose a mode by who manages the host and whom the workload needs protection from. For an introduction to the platform, refer to the [NVIDIA Confidential Computing overview](./).
+
+The three modes are not ranked against each other. This page defines the roles that the modes refer to, explains what each mode protects and does not protect, and helps you select a mode for your workload.
+
+## Roles
+
+The descriptions of the modes use the following roles.
+
+| Role | Definition |
+| --- | --- |
+| Infrastructure provider | The organization that owns or operates the host hardware, the platform services, the Kubernetes control plane, or the managed service that runs the workloads. |
+| Model owner | The organization, such as an AI lab, that owns the model, the workload, the application, the data, the encryption keys, the attestation policy, and the security requirements. |
+| End user | The downstream user, customer, or application whose prompts, embeddings, inference inputs and outputs, or application data must be protected while the model or service runs. |
+
+The modes also differ in who manages the host:
+
+- In a **model-owner-managed** deployment, the model owner receives the whole host and manages the software stack and the trust policy inside the model owner's own trust boundary.
+- In a **provider-managed** deployment, the infrastructure provider manages the host or the control plane. The protection for the model owner and the end user depends on the mode that you select and the attested trust boundary of that mode.
+
+## Modes
+
+NVIDIA Confidential Computing supports the following three modes:
+
+- [Confidential Bare Metal](/confidential-computing/bare-metal) (CBM) gives the model owner a dedicated bare-metal host with NVIDIA Confidential Computing platform security controls.
+- [Confidential Virtual Machines](/confidential-computing/cvm) (CVM) run model-owner VM images with a persistent VM lifecycle on a provider-managed KubeVirt cluster.
+- [Confidential Containers](/confidential-computing/containers) run Kubernetes-native confidential workloads on a provider-managed bare-metal Kubernetes cluster.
+
+In all three modes, the goal is to prevent the infrastructure provider from accessing unencrypted model weights and end-user data. The modes reach that goal with different trust boundaries:
+
+- **CBM** relies on attestation of the platform and the GPU, plus defense-in-depth platform security controls, instead of a CPU trusted execution environment (TEE). CBM does not need a CPU TEE because no other party shares the host: the model owner holds the host.
+- **CBM** removes the infrastructure provider from the model owner's trust boundary. CBM does not protect end-user data from the model owner unless the model owner deploys an additional confidential VM or confidential container layer on the bare-metal host.
+- **CVM** and **Confidential Containers** add a CPU TEE that isolates the workload from a privileged host. These two modes support provider-managed hosts when the deployment meets the control-plane and tenant-isolation requirements in [Comparison of the Modes](#comparison-of-the-modes).
+
+## Mode Selection
+
+Answer the following questions in order. Stop at the first question that you answer with yes.
+
+1. Does the model owner receive the whole host and manage the infrastructure? If yes, use **CBM**. The model owner can still run confidential VMs or confidential containers on that host, but the model owner manages those layers, and those layers are not part of the provider-managed modes.
+1. On a provider-managed host, is the model owner's workload a VM? If yes, use **CVM**.
+1. On a provider-managed host, is the model owner's workload a Kubernetes container workload? If yes, use **Confidential Containers**.
+1. Is the Kubernetes cluster itself virtualized, or does your deployment require a VM management platform other than KubeVirt? If yes, the deployment is outside the three supported modes. Refer to [Deployment Patterns Outside the Supported Modes](#deployment-patterns-outside-the-supported-modes).
+
+The following diagram shows the selection flow:
+
+```mermaid
+flowchart TD
+    Q1{"Does the model owner receive<br/>the whole bare-metal host?"}
+    Q2{"On a provider-managed host,<br/>is the workload a VM?"}
+    Q3{"On a provider-managed host,<br/>is the workload a Kubernetes container?"}
+    Q4{"Is the Kubernetes cluster virtualized, or is a<br/>VM platform other than KubeVirt required?"}
+    CBM["Confidential Bare Metal (CBM)"]
+    CVM["Confidential Virtual Machines (CVM)<br/>on KubeVirt"]
+    COCO["Confidential Containers<br/>on bare-metal Kubernetes"]
+    OUT["Outside the supported modes"]
+
+    Q1 -->|Yes| CBM
+    Q1 -->|No| Q2
+    Q2 -->|Yes| CVM
+    Q2 -->|No| Q3
+    Q3 -->|Yes| COCO
+    Q3 -->|No| Q4
+    Q4 -->|Yes| OUT
+```
+
+## Reference Architectures
+
+All three modes share the same platform components: host infrastructure software, Kubernetes platform services, GPU and device lifecycle management, networking, observability, attestation and key-release policy, and a trusted administration plane.
+
+### Confidential Bare Metal
+
+In CBM, the model owner, not the infrastructure provider, holds the host. Trust comes from measured boot and attestation of the platform and the GPU rather than from a CPU TEE. The model owner verifies the platform before the model owner releases any protected material, such as model weights, to the workload.
+
+The following diagram shows the CBM stack and the attestation flow. The model weights stay encrypted until the attestation evidence passes verification and the key-release policy releases the decryption key to the workload.
+
+```mermaid
+flowchart LR
+    subgraph HOST["Dedicated host, managed by the model owner"]
+        direction TB
+        W["Model-owner workload<br/>Model weights decrypted only after attestation"]
+        OS["Guest OS and driver stack<br/>Managed by the model owner"]
+        P["Attested platform<br/>Measured boot, firmware and driver reference values"]
+        G["GPU with confidential computing enabled<br/>Platform attestation evidence"]
+        W --- OS --- P --- G
+    end
+    POL["Attestation and key-release policy"]
+    P -->|Attestation evidence| POL
+    G -->|Attestation evidence| POL
+    POL -->|Key release| W
+```
+
+The attestation and key-release policy checks the following items before the policy releases a key:
+
+- CPU and GPU attestation evidence
+- Firmware and driver reference values
+- Workload image identity
+- Model owner identity
+- Authorized administrators
+- Key-release conditions
+
+### Confidential Virtual Machines and Confidential Containers
+
+CVM and Confidential Containers both run on provider-managed hosts, and both isolate the model owner's workload from the privileged host with a CPU TEE. The two modes differ in workload type and in who owns the workload lifecycle.
+
+The following diagram shows the CVM and Confidential Containers stacks and the platform components that both stacks share. In both stacks, the CPU TEE boundary separates the model-owner workload from the provider-managed layers below the TEE boundary.
+
+```mermaid
+flowchart TB
+    subgraph CVMSTACK["CVM on KubeVirt"]
+        direction TB
+        CW["Model-owner VM<br/>Guest OS, driver, and workload"]
+        CT["Confidential VM<br/>CPU TEE boundary"]
+        CK["KubeVirt cluster<br/>Managed by the provider"]
+        CA["Trusted administration plane"]
+        CW --- CT --- CK --- CA
+    end
+    subgraph COCOSTACK["Confidential Containers on bare-metal Kubernetes"]
+        direction TB
+        PW["Pod<br/>Model-owner workload"]
+        PT["Kata Containers microVM<br/>CPU TEE boundary"]
+        PR["containerd and CRI"]
+        PK["Bare-metal Kubernetes<br/>Managed by the provider"]
+        PA["Trusted administration plane"]
+        PW --- PT --- PR --- PK --- PA
+    end
+    SHARED["Shared platform components<br/>Trustee attestation and key release, CPU and GPU attestation evidence,<br/>GPU confidential computing, host software, device lifecycle,<br/>networking, observability"]
+    CA --- SHARED
+    PA --- SHARED
+```
+
+### Attestation and Key Release
+
+The three modes use the same attestation architecture, based on the [Trustee](https://github.com/confidential-containers/trustee) project from Confidential Containers. Trustee includes a Key Broker Service (KBS) that verifies CPU and GPU attestation evidence against reference values and an attestation policy, and then releases keys and other secrets only to workloads that pass verification. For more information, refer to [Attestation](./guides/attestation).
+
+## Comparison of the Modes
+
+The following table compares the three modes.
+
+| Dimension | CBM | CVM | Confidential Containers |
+| --- | --- | --- | --- |
+| Best fit | Dedicated bare-metal hosts for a single model owner | VM as a service, model-owner VM images, persistent VM lifecycle | Kubernetes-native confidential workloads |
+| Who manages the host | Model owner | Infrastructure provider | Infrastructure provider |
+| Isolation boundary | Host | VM, if you isolate the KubeVirt cluster | Pod or workload, if you separate the Kubernetes control plane |
+| Isolation from a privileged host | No CPU TEE. Relies on platform attestation, GPU confidential computing, and platform security controls. | Yes. A confidential VM provides a CPU TEE for each VM. | Yes. A Kata Containers microVM provides a CPU TEE for each workload. |
+| Control-plane requirement | The model owner receives the host. The administration services and the workload launch path stay inside the model owner's trust boundary. | The model owner has no Kubernetes credentials on the KubeVirt cluster, the host has no out-of-band access path into the VM, and you isolate the model owner's network. | A single-tenant Kubernetes control plane, or a separate control plane for each tenant. |
+| Operational effort for the model owner | Highest. The model owner manages the whole stack. | Medium. The model owner owns the VM images and the VM lifecycle. | Lowest. The model owner deploys standard Kubernetes workloads. |
+| Protection from the infrastructure provider | The provider is outside the runtime trust boundary after the model owner receives the dedicated host and verifies the platform and GPU state. The model owner remains responsible for managing the stack. | The confidential VM protects model-owner data and end-user data from the provider-managed host, if you isolate the KubeVirt cluster, give the model owner no Kubernetes credentials, allow no out-of-band access path from the host into the VM, and isolate the model owner's network. | The CPU TEE and the Kata Containers isolation protect model-owner data and end-user data from the provider-managed host, if you enforce tenant separation, control-plane separation, and the attestation policy. |
+
+<Warning title="Limits of confidential computing">
+In all three modes, confidential computing protects the confidentiality of data in use and the integrity of the workload within a defined trust boundary. Confidential computing does not automatically remove every risk from shared hardware, shared network fabric, other tenants, or side channels. Rely on multi-tenant isolation only when your actual deployment topology provides the required isolation.
+</Warning>
+
+## Use Cases
+
+The three modes address the following use cases:
+
+- **Model weight protection.** Store the model weights encrypted, and release the decryption key only to a workload that passes attestation.
+- **End-user data protection.** Protect sensitive end-user data, such as prompts, embeddings, inference inputs and outputs, and application data, during processing. Release secrets only to verified workloads that run in the intended mode, including on provider-managed hosts.
+
+## Deployment Patterns Outside the Supported Modes
+
+The following deployment patterns are technically valid, and some patterns run in production today. NVIDIA does not offer these patterns as reference architectures because each pattern multiplies the combinations of CPU vendor, hypervisor, Kubernetes distribution, GPU attestation topology, and GPU passthrough configuration that NVIDIA must test.
+
+| Deployment pattern | Reason the pattern is outside the supported modes |
+| --- | --- |
+| Confidential VMs on a conventional provider-managed hypervisor | The infrastructure provider owns the hypervisor and the attestation verifier, so NVIDIA cannot own the chain of trust end to end. |
+| Peer pods, or Confidential Containers on virtualized Kubernetes | NVIDIA has not validated the GPU attestation and GPU passthrough path as a reference architecture and does not provide support for this pattern. |
+| Nested or partitioned virtualization | The pattern is not yet standardized, and NVIDIA does not validate this pattern. |
+
+For these deployment patterns, NVIDIA does not provide a validation matrix, GPU attestation coverage, or support as a reference architecture. A deployment of one of these patterns can be production-grade for the organization that runs the deployment. If your requirements mandate one of these patterns, NVIDIA handles the deployment as a custom engagement with scoped validation and an explicitly bounded support commitment.
+
+## Related Topics
+
+- [Threat Model Comparison](./threat-model)
+- [Hopper and Blackwell CC Capabilities](./gpu-capabilities)
+- [Verifier](./guides/verifier)
+- [Compatibility Matrix](./guides/compatibility-matrix)
