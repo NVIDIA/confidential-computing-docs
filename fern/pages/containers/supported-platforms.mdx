@@ -1,5 +1,5 @@
 ---
-title: "Supported Platforms"
+title: "Supported Platforms and Software Components"
 license: Apache-2.0
 copyright: "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved."
 description: "Following are the platforms supported by the NVIDIA Confidential Containers Reference Architecture."
@@ -15,7 +15,7 @@ This page is relevant to the following users:
 
 - The [Host OS Administrator](./personas.mdx#coco-persona-host-os-administrator) uses the hardware tables to confirm validated host OS and kernel versions.
 
-- The [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-cluster-administrator) uses the software component matrix to confirm that the correct versions are in place before beginning cluster installation.
+- The [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-cluster-administrator) uses the component matrix to confirm supported versions.
 
 ## Hardware
 
@@ -28,6 +28,7 @@ This page is relevant to the following users:
 | NVIDIA H100 Protected PCIe (PPCIe) | Multi-GPU |
 | NVIDIA H200 Protected PCIe (PPCIe) | Multi-GPU |
 | NVIDIA B200 | Single-GPU, Multi-GPU |
+| NVIDIA HGX B300 | Single-GPU, Multi-GPU |
 | NVIDIA RTX Pro 6000 BSE | Single-GPU |
 
 <Note>
@@ -42,12 +43,12 @@ Configuring only some GPUs on a node for Confidential Computing is not supported
 
 </Note>
 
-### CPU Platforms
+### Host Platforms
 
-| Category | TEE | Operating System | Kernel Version |
+| CPU Platform | TEE | Host Operating System | Host Kernel Version |
 | --- | --- | --- | --- |
-| AMD Genoa / Milan | AMD SEV-SNP | Ubuntu 25.10 | 6.17+ |
-| Intel Emerald Rapids (ER) /  Granite Rapids (GR) | Intel TDX | Ubuntu 25.10 | 6.17+ |
+| AMD Genoa / Milan | AMD SEV-SNP | Ubuntu 25.10 or 26.04 | 6.17+ |
+| Intel Emerald Rapids (ER) /  Granite Rapids (GR) | Intel TDX | Ubuntu 25.10 or 26.04 | 6.17+ |
 
 For additional information on node configuration, refer to the [Confidential Computing Deployment Guide](https://docs.nvidia.com/cc-deployment-guide-tdx-snp.pdf) for information about supported NVIDIA GPUs, such as the NVIDIA Hopper H100.
 
@@ -57,7 +58,7 @@ The following topics in the deployment guide apply to a cloud-native environment
 
 - Host operating system selection, initial configuration, and validation.
 
-When following the cloud-native sections in the deployment guide linked above, use Ubuntu 25.10 as the host OS with its default kernel version and configuration.
+When following the cloud-native sections in the deployment guide linked above, use Ubuntu 25.10 or 26.04 as the host OS with its default kernel version and configuration.
 
 For additional resources on machine setup:
 
@@ -69,17 +70,38 @@ For additional resources on machine setup:
 
 ## Supported Software Components
 
-| Component | Release/Version |
-| --- | --- |
-| Guest OS | Distroless |
-| Guest kernel | 6.18.5 |
-| [OVMF](https://github.com/tianocore/edk2) | edk2-stable202511 |
-| [QEMU](https://www.qemu.org/) | 10.1 + Patches |
-| [Containerd](https://github.com/containerd/containerd) | 2.2.2 |
-| [Kubernetes](https://kubernetes.io/) | 1.32 + |
-| [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) and its components.Refer to the [GPU Operator Component Matrix](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#operator-component-matrix) for the list of components and versions included in each release. | v26.3.1 and higher |
-| [Kata Containers](https://katacontainers.io/) | 3.29 (installed with <code>kata-deploy</code> Helm chart) |
-| [Key Broker Service (KBS) protocol](https://confidentialcontainers.org/docs/attestation/) | 0.4.0 |
-| [Kata Lifecycle Manager](https://github.com/kata-containers/lifecycle-manager) | 0.1.4 |
+### Cluster and Deployment Software
 
-Users may leverage [Red Hat OpenShift Sandboxed Containers](https://docs.redhat.com/en/documentation/openshift_sandboxed_containers/1.12) to deploy Confidential Containers, however, Confidential GPU features are currently classified as Technology Preview by the downstream provider.
+The installation guides begin with an existing Kubernetes cluster that uses `containerd`.
+You then install Kata Containers and the NVIDIA GPU Operator.
+
+| Component | Release/Version | Installation |
+| --- | --- | --- |
+| [Kubernetes](https://kubernetes.io/) | 1.32 + | Prerequisite, must already be installed on the cluster hosts. |
+| [containerd](https://github.com/containerd/containerd) | 2.3.x | Prerequisite, must already be installed on the cluster hosts. |
+| [Kata Containers](https://katacontainers.io/) | ${kata_version} | Installed with the <code>kata-deploy</code> Helm chart by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
+| [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) and its components.Refer to the [GPU Operator Component Matrix](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#operator-component-matrix) for the list of components and versions included in each release. | ${gpu_operator_version} and higher | Installed by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
+
+### Kata-provided Guest and Runtime Artifacts
+
+The supported `kata-deploy` Helm chart installs the guest OS, guest kernel, OVMF, and QEMU artifacts listed in the following table as part of Kata Containers.
+You do not supply or install these artifacts individually.
+
+| Artifact | Release/Version |
+| --- | --- |
+| Guest OS | Distroless, with [NVRC ${nvrc_version}](https://github.com/NVIDIA/nvrc/releases/tag/${nvrc_version}), NVIDIA GPU driver ${guest_nvidia_driver_version}, and [guest-components ${guest_components_version}](https://github.com/confidential-containers/guest-components/releases/tag/${guest_components_version}) artifacts. |
+| Guest kernel | ${guest_kernel_version} |
+| [OVMF](https://github.com/tianocore/edk2) | edk2-stable202511 |
+| [QEMU](https://www.qemu.org/) | ${qemu_version} + Patches |
+
+### Separately Deployed Components and Interfaces
+
+The following components and interfaces are not installed by the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx).
+
+| Interface or Component | Version | When It Is Needed | How It Is Provided |
+| --- | --- | --- | --- |
+| [Trustee](https://github.com/confidential-containers/trustee/releases/tag/${trustee_version}) | ${trustee_version} | Required for attestation and secret or key release. This architecture validates Trustee ${trustee_version} with guest-components ${guest_components_version} in the Kata guest. | The [Attestation](./attestation.mdx) quickstart installs a local evaluation Trustee ${trustee_version}. Deploy a production Trustee separately by following the upstream Confidential Containers documentation. |
+| [Kata Lifecycle Manager](https://github.com/kata-containers/lifecycle-manager) | 0.1.8 | Optional for Kata Containers upgrades and day-two lifecycle management. | Install separately by following the upstream Kata Lifecycle Manager documentation. |
+| [Kata Containers genpolicy](https://github.com/kata-containers/kata-containers/blob/${genpolicy_version}/src/tools/genpolicy/README.md) | ${genpolicy_version} | Used to generate an agent security policy for attested production workloads. Refer to [Attach a Kata Agent Security Policy](./configure-workloads.mdx#kata-agent-security-policy). | Download <code>genpolicy</code> ${genpolicy_version} from the [Kata Containers ${genpolicy_version} release](https://github.com/kata-containers/kata-containers/releases/tag/${genpolicy_version}). |
+
+Users may leverage [Red Hat OpenShift Sandboxed Containers](https://docs.redhat.com/en/documentation/openshift_sandboxed_containers/1.13) to deploy Confidential Containers.

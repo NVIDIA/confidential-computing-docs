@@ -12,22 +12,25 @@ As a [Container User](./personas.mdx#coco-persona-container-user), use this page
 A Confidential Container workload is a standard Kubernetes pod that runs inside a TEE-protected
 virtual machine and requests one or more GPUs through the NVIDIA Kata sandbox device plugin.
 Compared with a traditional GPU pod, a Confidential Container workload pod manifest differs in
-three ways:
+various ways. In particular, the pod manifest:
 
-- It selects a TEE-aware Kata runtime class instead of the default `runc`-based runtime.
+- Selects a TEE-aware Kata runtime class instead of the default `runc`-based runtime.
 
-- It requests GPU and NVSwitch resources using the resource types advertised by the NVIDIA
+- Requests GPU and NVSwitch resources using the resource types advertised by the NVIDIA
 Kata sandbox device plugin, which can be either default names or model-specific names.
 
-- For NVSwitch-based HGX systems, it requests every GPU and NVSwitch on the node together so
+- For NVSwitch-based HGX systems, requests every GPU and NVSwitch on the node together so
 that all devices reside inside the same Confidential Container virtual machine.
+
+- For an attested production deployment, includes a Kata agent security policy that limits
+which Agent API calls the untrusted host can make into the guest.
 
 **Before this page:** Complete the [Detailed Install Guide](./confidential-containers-deploy.mdx) and verify the cluster with [Run a Sample Workload](./run-sample-workload.mdx) (`Test PASSED` in pod logs).
 For install steps, refer to [Prerequisites](./prerequisites.mdx) and [Detailed Install Guide](./confidential-containers-deploy.mdx).
 
 This page describes each of these decisions and provides single-GPU and multi-GPU passthrough
 manifest examples that you can copy and adapt to your environment.
-The install sample uses a minimal manifest.
+The install sample uses a minimal manifest and does not attach an agent security policy.
 
 ## Select a Container Runtime Class
 
@@ -286,7 +289,64 @@ for details.
    kubectl delete -f multi-gpu-kata.yaml
    ```
 
+<Anchor id="kata-agent-security-policy"></Anchor>
+
+## Attach a Kata Agent Security Policy
+
+The Kata agent runs inside the guest virtual machine and manages the container lifecycle.
+Because the Kata shim on the host is outside the TEE, the untrusted host can still issue Agent
+API calls into the guest unless you restrict those Agent API calls.
+An *agent security policy* is a Rego policy that the agent enforces so that only the operations
+your workload declared are allowed.
+
+The [sample workload](./run-sample-workload.mdx) omits an agent policy so that you can confirm
+GPU passthrough with the smallest possible manifest.
+Do not treat that YAML as a production template.
+
+The Kata Containers `genpolicy` tool reads your Kubernetes YAML, infers the intended Agent API
+calls, encodes the policy in base64, and appends it as an annotation on the same file.
+The Kata agent in the guest receives that annotation.
+Use `genpolicy` ${genpolicy_version}, which is the version this architecture validates with that agent.
+Refer to [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components) for the component matrix.
+
+1. Download `genpolicy` ${genpolicy_version} from the
+[Kata Containers ${genpolicy_version} release](https://github.com/kata-containers/kata-containers/releases/tag/${genpolicy_version}).
+For usage details, refer to the
+[Agent Policy generation tool](https://github.com/kata-containers/kata-containers/blob/${genpolicy_version}/src/tools/genpolicy/README.md)
+documentation.
+
+1. Run `genpolicy` against the manifest to deploy:
+
+   ```console
+   genpolicy -y cuda-vectoradd-kata.yaml
+   ```
+
+   Review the generated policy before you apply the manifest.
+The automatically-generated policy is a starting point.
+The policy can allow operations you do not want, such as `kubectl exec`, or omit operations your
+workload needs.
+
+   <Info>
+   Review and, if needed, edit the policy so that it matches your threat model before you
+use it.
+
+   </Info>
+
+1. Apply the annotated manifest:
+
+   ```console
+   kubectl apply -f cuda-vectoradd-kata.yaml
+   ```
+
 ## Next Steps
+
+- Refer to [Attestation](./attestation.mdx) for Trustee concepts and a local connectivity test.
+A complete attestation scenario must not only cover the TEE but also the Kata Agent API surface.
+For this purpose, the agent security policy contained in the workload annotation is included in the measured
+payload that is attested with the guest.
+The agent security policy is distinct from the Trustee attestation policy that decides whether
+to release secrets.
+Refer to the upstream [Understanding CoCo Policies](https://confidentialcontainers.org/docs/getting-started/securing-workloads/#understanding-coco-policies).
 
 - Refer to [Managing the Confidential Computing Mode](./configure-cc-mode.mdx) to change the CC mode on GPUs at the cluster or node level.
 

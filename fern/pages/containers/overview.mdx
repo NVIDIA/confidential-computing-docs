@@ -125,6 +125,7 @@ Instead, the snapshotter fetches and unpacks encrypted and signed container imag
 
 Runs inside the guest VM to manage the container lifecycle while enforcing a strict, immutable agent security policy based on Rego (regorus).
 This blocks the untrusted host from executing unauthorized commands, such as a malicious `kubectl exec`.
+For how to generate and attach a policy to a workload, refer to [Attach a Kata Agent Security Policy](./configure-workloads.mdx#kata-agent-security-policy).
 
 **Trustee and Attestation Service**
 
@@ -197,7 +198,7 @@ Configuring only some GPUs on a node for Confidential Computing is not supported
 
 - Composite [attestation](./attestation.mdx) using Trustee and the NVIDIA Remote Attestation Service (NRAS).
 
-- Generating Kata Agent Security Policies using the [genpolicy tool](https://github.com/kata-containers/kata-containers/blob/main/src/tools/genpolicy/README.md).
+- Generating Kata Agent Security Policies.
 
 - Use of [signed sealed secrets](https://confidentialcontainers.org/docs/features/sealed-secrets/).
 
@@ -258,8 +259,8 @@ Achieve availability through replication, which is standard practice in Kubernet
 To deploy on your cluster, start with the **Install** section:
 
 <CardGroup cols={2}>
-<Card href="./supported-platforms.mdx" icon="solid server" iconSize={8} title="Supported Platforms">
-Hardware, OS, and component versions validated for general availability (GA).
+<Card href="./supported-platforms.mdx" icon="solid server" iconSize={8} title="Supported Platforms and Software Components">
+Validated hardware, OS, and component versions.
 
 </Card>
 

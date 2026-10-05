@@ -127,29 +127,33 @@ After all your desired nodes are labeled, you can continue to the next step to i
 Install Kata Containers using the `kata-deploy` Helm chart.
 The `kata-deploy` chart installs all required components from the Kata Containers project including the Kata Containers runtime binary, runtime configuration, UVM kernel, and images that NVIDIA uses for Confidential Containers and native Kata containers.
 
-The minimum required version is 3.29.0.
+The minimum required version is ${kata_version}.
 
 1. Set the chart version and registry path:
 
    ```console
-   export VERSION="3.29.0"
+   export VERSION="${kata_version}"
    export CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
    ```
 
-1. Install the kata-deploy Helm chart:
+1. Create a values file, such as `kata-nvidia-gpu-values.yaml`, to configure the `kata-deploy` chart for NVIDIA Confidential Containers:
+
+   <Code src="_includes/samples/kata-nvidia-gpu-values.yaml" language="yaml" />
+
+1. Install the kata-deploy Helm chart with the values file:
 
    ```console
-   helm install kata-deploy "${CHART}" \
+   helm install kata-deploy "\$\{CHART\}" \
       --namespace kata-system --create-namespace \
-      --set nfd.enabled=false \
+      -f kata-nvidia-gpu-values.yaml \
       --wait --timeout 10m \
-      --version "${VERSION}"
+      --version "\$\{VERSION\}"
    ```
 
    *Example Output immediately after running the command:*
 
    ```output
-   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:3.29.0
+   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:${kata_version}
    Digest: sha256:aea41018779716ce2e0bf406d701637d10fb5a0792db51a08dfd3f76701eb933
    ```
 
@@ -159,7 +163,7 @@ It can take a 2-3 minutes to return more output.
    *Example Output when the release is deployed:*
 
    ```output
-   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:3.29.0
+   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:${kata_version}
    Digest: sha256:aea41018779716ce2e0bf406d701637d10fb5a0792db51a08dfd3f76701eb933
    LAST DEPLOYED: Wed Apr  1 17:03:00 2026
    NAMESPACE: kata-system
@@ -179,8 +183,8 @@ If you are deploying to a single node cluster, you may need to wait for an addit
 The following steps confirm the Kata components are healthy.
 
    <Note>
-   Both `kata-deploy` and the GPU Operator deploy Node Feature Discovery (NFD) by default.
-The install command includes `--set nfd.enabled=false` to prevent `kata-deploy` from deploying NFD.
+   Both `kata-deploy` and the GPU Operator can deploy Node Feature Discovery (NFD).
+The values file disables the NFD deployment by `kata-deploy`.
 The GPU Operator will deploy and manage NFD in the next step.
 
    </Note>
@@ -281,7 +285,7 @@ Refer to the [Label Nodes for Confidential Containers Components](#coco-label-no
       --set sandboxWorkloads.mode=kata \
       --set nfd.enabled=true \
       --set nfd.nodefeaturerules=true \
-      --version=v26.3.1
+      --version=${gpu_operator_version}
    ```
 
    *Example Output:*
@@ -387,17 +391,17 @@ The following example installs the GPU Operator with both `P_GPU_ALIAS` and `NVS
 
 ```console
 helm install --wait --timeout 10m --generate-name \
-     -n gpu-operator --create-namespace \
-     nvidia/gpu-operator \
-     --set sandboxWorkloads.enabled=true \
-     --set sandboxWorkloads.mode=kata \
-     --set nfd.enabled=true \
-     --set nfd.nodefeaturerules=true \
-     --set kataSandboxDevicePlugin.env[0].name=P_GPU_ALIAS \
-     --set kataSandboxDevicePlugin.env[0].value="" \
-     --set kataSandboxDevicePlugin.env[1].name=NVSWITCH_ALIAS \
-     --set kataSandboxDevicePlugin.env[1].value="" \
-     --version=v26.3.1
+   -n gpu-operator --create-namespace \
+   nvidia/gpu-operator \
+   --set sandboxWorkloads.enabled=true \
+   --set sandboxWorkloads.mode=kata \
+   --set nfd.enabled=true \
+   --set nfd.nodefeaturerules=true \
+   --set kataSandboxDevicePlugin.env[0].name=P_GPU_ALIAS \
+   --set kataSandboxDevicePlugin.env[0].value="" \
+   --set kataSandboxDevicePlugin.env[1].name=NVSWITCH_ALIAS \
+   --set kataSandboxDevicePlugin.env[1].value="" \
+   --version=${gpu_operator_version}
 ```
 
 After installing the GPU Operator, you can view the GPU or NVSwitch resource types available on a node by running the following command:

@@ -38,24 +38,28 @@ By the end of this quickstart, you will have:
 1. Set the chart version and registry path:
 
    ```console
-   export VERSION="3.29.0"
+   export VERSION="${kata_version}"
    export CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
    ```
 
-1. Install the `kata-deploy` Helm chart:
+1. Create a values file, such as `kata-nvidia-gpu-values.yaml`, to configure the `kata-deploy` chart for NVIDIA Confidential Containers:
+
+   <Code src="_includes/samples/kata-nvidia-gpu-values.yaml" language="yaml" />
+
+1. Install the `kata-deploy` Helm chart with the values file:
 
    ```console
-   helm install kata-deploy "${CHART}" \
+   helm install kata-deploy "\$\{CHART\}" \
       --namespace kata-system --create-namespace \
-      --set nfd.enabled=false \
+      -f kata-nvidia-gpu-values.yaml \
       --wait --timeout 10m \
-      --version "${VERSION}"
+      --version "\$\{VERSION\}"
    ```
 
    *Example Output:*
 
    ```output
-   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:3.29.0
+   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:${kata_version}
    Digest: sha256:aea41018779716ce2e0bf406d701637d10fb5a0792db51a08dfd3f76701eb933
    LAST DEPLOYED: Wed Apr  1 17:03:00 2026
    NAMESPACE: kata-system
@@ -146,7 +150,7 @@ Otherwise, refer to [Troubleshooting](./troubleshooting.mdx).
       --set sandboxWorkloads.mode=kata \
       --set nfd.enabled=true \
       --set nfd.nodefeaturerules=true \
-      --version=v26.3.1
+      --version=${gpu_operator_version}
    ```
 
    *Example Output:*
