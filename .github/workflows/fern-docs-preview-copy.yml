@@ -26,8 +26,8 @@ jobs:
       pull-requests: write
     uses: NVIDIA/docs-builder/.github/workflows/_fern_docs_preview_copy.yml@main  # zizmor: ignore[unpinned-uses] -- Fern OIDC trust pins refs/heads/main
     with:
-      fern-package: https://github.com/mikemckiernan/fern/releases/download/v5.143.2-nvidia.2/fern-api-5.143.2-nvidia.2.tgz
-      fern-package-sha256: e9ab702a4d6736280cb8fb542f9edd1661ea83c045f8cb4a39148ae37f7aba1d
+      fern-package: https://github.com/mikemckiernan/fern/releases/download/v5.143.2-nvidia.3/fern-api-5.143.2-nvidia.3.tgz
+      fern-package-sha256: f25bca570f33affa92db4c5831eb432a53bab33f4c0bd036826f7ecfbe407fd4
     secrets:
       DOCS_FERN_AWS_ROLE_TO_ASSUME: ${{ secrets.DOCS_FERN_AWS_ROLE_TO_ASSUME }}
       DOCS_FERN_SECRET_ID: ${{ secrets.DOCS_FERN_SECRET_ID }}
