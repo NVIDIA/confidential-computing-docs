@@ -11,28 +11,29 @@ As a [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-c
 You perform most steps in this section.
 If you do not have access to host firmware, coordinate with your [Hardware IT Administrator](./personas.mdx#coco-persona-hardware-it-administrator) or [Host OS Administrator](./personas.mdx#coco-persona-host-os-administrator) to confirm or implement hardware prerequisites.
 
-For validated hardware and software versions, refer to [Supported Platforms](./supported-platforms.mdx).
-Use the checklists below for an at-a-glance summary, then follow each linked section for verification steps.
+Use the following checklists as at-a-glance summary and supplement to the [Supported Platforms](./supported-platforms.mdx) page.
 
-**Hardware prerequisites**
+**Hardware Configuration Requirements**
 
-| Prerequisite | Details |
+For validated hardware, refer to [Supported Platforms](./supported-platforms.mdx).
+
+| Configuration Requirement | Details |
 | --- | --- |
-| [Use a supported platform](#coco-prereq-supported-platform) | CPU, GPU, and host OS match [Supported Platforms](./supported-platforms.mdx) |
 | [Hardware virtualization and ACS enabled](#coco-prereq-hw-virtualization) | Hardware virtualization and ACS enabled in host BIOS |
 | [IOMMU enabled](#coco-prereq-iommu) | IOMMU enabled on each host through the kernel command line (<code>amd&#95;iommu=on</code> or <code>intel&#95;iommu=on</code>) |
 | [No host NVIDIA GPU drivers](#coco-prereq-no-host-drivers) | No NVIDIA GPU drivers installed or loaded on worker hosts. |
 
-**Cluster prerequisites**
+**Cluster Configuration Requirements**
 
-| Prerequisite | Details |
+For validated software components, refer to [Supported Platforms](./supported-platforms.mdx).
+
+| Configuration Requirement | Details |
 | --- | --- |
-| [A Kubernetes cluster and cluster administrator access](#coco-prereq-cluster-admin) | Cluster administrator access to a Kubernetes cluster running a supported version (refer to [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components)) |
-| [containerd 2.2.2 installed](#coco-prereq-containerd) | containerd 2.2.2 installed on each GPU worker node |
+| [A Kubernetes cluster and cluster administrator access](#coco-prereq-cluster-admin) | Cluster administrator access to a Kubernetes cluster running a supported version. |
 | [Helm installed](#coco-prereq-helm) | Helm installed on your cluster administration system |
 | [Kubelet configured](#coco-prereq-kubelet) | Enable <code>KubeletPodResourcesGet</code> (required before Kubernetes v1.34) and <code>RuntimeClassInImageCriApi</code> feature gates; set <code>runtimeRequestTimeout: 20m</code> on GPU worker nodes |
 
-## Hardware and BIOS
+## Hardware and BIOS Configuration Requirements
 
 <Anchor id="coco-prereq-supported-platform"></Anchor>
 
@@ -136,7 +137,7 @@ In this architecture, the NVIDIA GPU Operator handles GPU driver installation an
 
    Refer to [Removing the Driver](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/removing-the-driver.html) in the NVIDIA Driver Installation Guide.
 
-## Kubernetes Cluster
+## Kubernetes Cluster Configuration Requirements
 
 The following sections describe requirements for worker nodes and for the system you use for cluster administration.
 
@@ -146,25 +147,6 @@ The following sections describe requirements for worker nodes and for the system
 
 You must have cluster administrator access to a Kubernetes cluster running a supported Kubernetes version.
 Refer to the [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components) section in [Supported Platforms](./supported-platforms.mdx) for supported Kubernetes and component versions.
-
-<Anchor id="coco-prereq-containerd"></Anchor>
-
-### containerd 2.2.2
-
-Verify the installed version on each GPU worker node:
-
-```console
-containerd --version
-```
-
-*Example Output:*
-
-```output
-containerd containerd.io 2.2.2 ...
-```
-
-Your actual output may vary, but the reported version must be `2.2.2`.
-If you are running a different version on any worker node, refer to the [containerd Getting Started guide](https://containerd.io/docs/2.2/getting-started/) for installation instructions.
 
 <Anchor id="coco-prereq-helm"></Anchor>
 

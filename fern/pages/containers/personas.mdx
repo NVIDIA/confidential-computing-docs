@@ -38,8 +38,8 @@ Depending on your role, you may complete several sections or only a subset.
 | [Hardware IT Administrator](#coco-persona-hardware-it-administrator) | Selects Confidential Computing-capable CPU and GPU hardware and configures BIOS/UEFI settings. | [Supported Platforms](./supported-platforms.mdx) |
 | [Host OS Administrator](#coco-persona-host-os-administrator) | Prepares the host operating system after hardware and BIOS configuration are complete. | [Supported Platforms](./supported-platforms.mdx) |
 | [Kubernetes Cluster Administrator](#coco-persona-kubernetes-cluster-administrator) | Installs and manages the Kubernetes cluster and the Confidential Containers software stack. | [Prerequisites](./prerequisites.mdx) |
-| [Security Engineer](#coco-persona-security-engineer) | Validates Confidential Computing configuration, attestation policy, and secret release for workloads. | [Attestation Quickstart](./attestation.mdx) |
-| [Container User](#coco-persona-container-user) | Deploys confidential GPU workloads on a prepared cluster. | [Configuring Workloads](./configure-workloads.mdx) |
+| [Security Engineer](#coco-persona-security-engineer) | Validates Confidential Computing configuration, attestation policy, agent security policy, and secret release for workloads. | [Attestation Quickstart](./attestation.mdx) |
+| [Container User](#coco-persona-container-user) | Deploys confidential GPU workloads on a prepared cluster, including generating and attaching an agent security policy. | [Configuring Workloads](./configure-workloads.mdx) |
 
 <Anchor id="coco-persona-hardware-it-administrator"></Anchor>
 
@@ -107,6 +107,7 @@ Relevant pages:
 
 - [Attestation Quickstart](./attestation.mdx): stand up a local Trustee instance and verify connectivity.
 Attestation is required for workloads that use secrets, encrypted container images, or authenticated registries.
+Review the [Kata agent security policy](./configure-workloads.mdx#kata-agent-security-policy) so the untrusted host cannot issue unauthorized Agent API calls into the guest.
 
 For production attestation workflows, secret management, and policy configuration, refer to the upstream [Confidential Containers attestation documentation](https://confidentialcontainers.org/docs/attestation/).
 
@@ -120,6 +121,6 @@ This persona works primarily with Kubernetes workload manifests and does not req
 
 Relevant pages:
 
-- [Configuring Workloads](./configure-workloads.mdx): runtime class selection, GPU and NVSwitch resource types, and single- or multi-GPU passthrough manifests.
+- [Configuring Workloads](./configure-workloads.mdx): runtime class selection, GPU and NVSwitch resource types, single- or multi-GPU passthrough manifests, and attaching a Kata agent security policy.
 
 - [Run a Sample Workload](./run-sample-workload.mdx): run the reference workload to confirm the cluster is ready before deploying your own application.
