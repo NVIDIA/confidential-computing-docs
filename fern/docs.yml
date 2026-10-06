@@ -80,6 +80,9 @@ products:
     path: ./products/containers/current.yml
     slug: containers
     versions:
+      - display-name: v1.1.0
+        ref: containers-v1.1.0
+        slug: v1.1.0
       - display-name: v1.0.0
         ref: containers-v1.0.0
         slug: v1.0.0
