@@ -1,6 +1,6 @@
 # Landing product: Dev navigation for the overview, concepts, and shared
 # guides (former "Platform Guides"). Product-specific material lives in the
-# bare-metal, cvm, and containers products, each with its own version list.
+# bare-metal, virtual-machines, and containers products, each with its own version list.
 
 navigation:
   - section: Confidential Computing
@@ -26,7 +26,7 @@ navigation:
         href: /confidential-computing/bare-metal
         icon: fa-solid fa-server
       - link: Confidential Virtual Machine
-        href: /confidential-computing/cvm
+        href: /confidential-computing/virtual-machines
         icon: fa-solid fa-cube
       - link: Confidential Containers
         href: /confidential-computing/containers

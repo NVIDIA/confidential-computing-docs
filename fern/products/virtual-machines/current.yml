@@ -1,0 +1,44 @@
+# Confidential Virtual Machine: Dev (working-tree) navigation. Release versions are
+# listed by hand in fern/docs.yml.
+
+navigation:
+  - section: Confidential Virtual Machine
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/virtual-machines/index.mdx
+        slug: ""
+      - page: Supported Platforms
+        path: ../../pages/virtual-machines/supported-platforms.mdx
+        slug: supported-platforms
+      - section: Deployment Guide
+        path: ../../pages/virtual-machines/deployment-guide.mdx
+        slug: deployment-guide
+        contents:
+          - page: Configuring the Hardware
+            path: ../../pages/virtual-machines/deploy-hardware.mdx
+            slug: hardware
+          - page: Configuring the Host
+            path: ../../pages/virtual-machines/deploy-host.mdx
+            slug: host
+          - page: Configuring the GPUs
+            path: ../../pages/virtual-machines/deploy-gpu-mode.mdx
+            slug: gpu-mode
+          - page: Creating a Confidential VM
+            path: ../../pages/virtual-machines/deploy-create-vm.mdx
+            slug: create-vm
+          - page: Configuring the Guest
+            path: ../../pages/virtual-machines/deploy-guest.mdx
+            slug: guest
+          - page: Attesting the GPU
+            path: ../../pages/virtual-machines/deploy-attest.mdx
+            slug: attest
+      - page: Reference Architecture
+        path: ../../pages/virtual-machines/reference-architecture.mdx
+        slug: reference-architecture
+      - page: Playbooks
+        path: ../../pages/virtual-machines/playbooks.mdx
+        slug: playbooks
+      - page: Performance
+        path: ../../pages/virtual-machines/performance.mdx
+        slug: performance

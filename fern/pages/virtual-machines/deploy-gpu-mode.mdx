@@ -1,0 +1,131 @@
+---
+title: "Configuring the GPUs"
+description: "Bind NVIDIA GPUs to VFIO and set the Confidential Computing or Protected PCIe mode before you pass the GPUs to a confidential virtual machine."
+---
+
+The Host OS Administrator binds the GPUs to VFIO and sets the GPU mode before passing the GPUs through to a CVM.
+If you have your own VM orchestration flow, you still need to complete the steps on this page to enable the NVIDIA GPUs in a confidential mode.
+
+## Binding the GPUs to VFIO
+
+GPU passthrough requires that you bind the GPUs to the VFIO driver.
+Run the following steps on the host.
+
+1. Identify the NVIDIA GPUs, which have the vendor ID `10de`.
+
+   The following example shows the output on an NVIDIA DGX B200 system:
+
+   ```console
+   $ lspci -d 10de: -n
+   1b:00.0 0302: 10de:2901 (rev a1)
+   43:00.0 0302: 10de:2901 (rev a1)
+   52:00.0 0302: 10de:2901 (rev a1)
+   61:00.0 0302: 10de:2901 (rev a1)
+   9d:00.0 0302: 10de:2901 (rev a1)
+   c3:00.0 0302: 10de:2901 (rev a1)
+   d1:00.0 0302: 10de:2901 (rev a1)
+   df:00.0 0302: 10de:2901 (rev a1)
+   ```
+
+   The following example shows the output on a system with an NVIDIA RTX PRO 6000 GPU:
+
+   ```console
+   $ lspci -d 10de: -n
+   01:00.0 0302: 10de:2bb5 (rev a1)
+   ```
+
+1. If you didn't reboot after you created `/etc/modules-load.d/vfio.conf` in [Configuring the Host](./deploy-host.mdx#loading-the-vfio-modules-automatically), load the VFIO modules:
+
+   ```console
+   $ sudo modprobe vfio
+   $ sudo modprobe vfio_pci
+   ```
+
+1. Bind the GPUs to VFIO by writing the vendor ID and the device ID to the `vfio-pci` driver.
+   The following example binds B200 GPUs, which have the device ID `2901`:
+
+   ```console
+   $ echo 10de 2901 | sudo tee /sys/bus/pci/drivers/vfio-pci/new_id
+   ```
+
+## Setting the GPU Mode
+
+You can change the GPU mode only from the host, by using a privileged call.
+The `nvidia_gpu_tools.py` script in the [NVIDIA GPU admin tools](https://github.com/NVIDIA/gpu-admin-tools) repository, which you cloned to `/shared/gpu-admin-tools`, makes this call.
+The script provides the following main options:
+
+- `--query-cc-settings` prints the current mode of the GPU.
+- `--set-cc-mode=<mode>` sets the CC mode of the GPU, where `<mode>` is `on`, `off`, or `devtools`.
+- `--set-ppcie-mode=<mode>` sets the PPCIe mode of the GPU, where `<mode>` is `on` or `off`.
+
+For a description of each mode, refer to the [NVIDIA Confidential Computing whitepaper](https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/HCC-Whitepaper-v1.0.pdf).
+
+The CC and PPCIe modes are mutually exclusive for each GPU.
+The following commands set the mode of every NVIDIA device.
+To set the mode of one GPU, replace `--gpu=$i` with `--gpu-bdf=<bus>:00.0`, where `<bus>` is the PCIe bus number of the GPU, and run the command without the loop.
+
+<Note>
+You can't set the GPU mode from a host that boots with Secure Boot enabled.
+Disable Secure Boot in the BIOS, or set the mode from within the guest.
+</Note>
+
+Run the commands from the `/shared/gpu-admin-tools` directory:
+
+```console
+$ cd /shared/gpu-admin-tools
+```
+
+### Confidential Computing Mode
+
+1. Turn off PPCIe mode on every NVIDIA device:
+
+   ```console
+   $ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-ppcie-mode=off --reset-after-ppcie-mode-switch --gpu=$i; done
+   ```
+
+1. Turn on CC mode on every NVIDIA device:
+
+   ```console
+   $ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-cc-mode=on --reset-after-cc-mode-switch --gpu=$i; done
+   ```
+
+   You can ignore errors for NVLink Switches, such as the following error:
+
+   ```output
+   2025-02-26,22:12:11.043 ERROR    Configuring CC not supported on NvSwitch 0000:07:00.0 NVSwitch_gen3 0x22a3 BAR0 0xa6000000
+   ```
+
+### Protected PCIe Mode
+
+PPCIe mode applies only to multi-GPU Hopper systems.
+
+1. Turn off CC mode on every NVIDIA device:
+
+   ```console
+   $ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-cc-mode=off --reset-after-cc-mode-switch --gpu=$i; done
+   ```
+
+1. Turn on PPCIe mode on every GPU and NVLink Switch:
+
+   ```console
+   $ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-ppcie-mode=on --reset-after-ppcie-mode-switch --gpu=$i; done
+   ```
+
+### Normal Operation
+
+To return every NVIDIA device to normal operation, turn off CC mode and PPCIe mode:
+
+```console
+$ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-cc-mode=off --reset-after-cc-mode-switch --gpu=$i; done
+$ for i in $(seq 0 $(($(lspci -nn | grep -c "10de") - 1))); do sudo python3 ./nvidia_gpu_tools.py --set-ppcie-mode=off --reset-after-ppcie-mode-switch --gpu=$i; done
+```
+
+<Warning>
+Set the mode of every GPU, and on Hopper systems every NVLink Switch, that you pass through to the CVM.
+The mode persists across reboots and power cycles.
+To revert the mode, run the commands again with `--set-cc-mode=off` or `--set-ppcie-mode=off`.
+</Warning>
+
+The GPUs and the optional NVLink Switches are now ready for you to assign to a CVM.
+If you already have a flow for creating and configuring VMs with KVM, skip to [Configuring the Guest](./deploy-guest.mdx).
+Otherwise, continue with [Creating a Confidential VM](./deploy-create-vm.mdx).

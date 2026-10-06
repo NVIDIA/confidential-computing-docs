@@ -1,0 +1,295 @@
+---
+title: "Configuring the Host"
+description: "Prepare an AMD SEV-SNP or Intel TDX host and its hypervisor to run confidential virtual machines with NVIDIA GPUs."
+---
+
+The Host OS Administrator receives a system with the BIOS configured for Confidential Computing, installs the host OS, and configures the host to provision CVMs.
+
+The NVIDIA Confidential Computing components run in the guest VM.
+Tuning the host OS and the hypervisor is outside the scope of this guide.
+
+## Performance Recommendations for Intel Hosts
+
+For maximum CVM performance on Intel CPUs, NVIDIA recommends the following settings:
+
+- Before you start the CVM, use the [standalone version of pepc](https://github.com/intel/pepc?tab=readme-ov-file#standalone-version) to make the following changes:
+  - Set the CPU frequency governor to `performance`.
+  - Disable the C1E and C6 CPU C-states.
+- After the CVM boots, pin the vCPUs of the QEMU process by using `taskset`.
+- Keep the [Intel TDX Module](https://github.com/intel/tdx-module) firmware up to date.
+  Use TDX Module version 1.x with Emerald Rapids CPUs and version 2.x with Granite Rapids CPUs.
+
+## Preparing the Host
+
+1. Create the `/shared` directory for the downloads and scripts in this guide, and give your user read and write permission on the directory:
+
+   ```console
+   $ sudo mkdir /shared
+   $ sudo chmod -R 777 /shared
+   $ cd /shared
+   ```
+
+1. Update the host packages, and reboot if the upgrade requires a reboot:
+
+   ```console
+   $ sudo apt update
+   $ sudo apt upgrade
+   $ sudo reboot
+   ```
+
+1. Clone the [NVIDIA GPU admin tools](https://github.com/NVIDIA/gpu-admin-tools) repository:
+
+   ```console
+   $ cd /shared
+   $ git clone https://github.com/NVIDIA/gpu-admin-tools
+   ```
+
+1. Install QEMU, OVMF, libvirt, and the InfiniBand diagnostics:
+
+   ```console
+   $ sudo apt update
+   $ sudo apt install qemu-system-x86 \
+       ovmf \
+       libvirt-daemon-system \
+       libvirt-clients \
+       infiniband-diags
+   ```
+
+1. Install the `nvlsm` package:
+
+   ```console
+   $ wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/nvlsm_2025.06.10-1_amd64.deb
+   $ sudo apt install ./nvlsm_2025.06.10-1_amd64.deb
+   ```
+
+## Validating SEV-SNP on AMD Hosts
+
+1. Confirm that the host runs kernel 6.14 or later:
+
+   ```console
+   $ uname -r
+   6.14.0-15-generic
+   ```
+
+1. Confirm that the kernel is configured with the elliptic curve cryptography options:
+
+   ```console
+   $ grep CONFIG_CRYPTO_EC /boot/config-$(uname -r)
+   CONFIG_CRYPTO_ECC=y
+   CONFIG_CRYPTO_ECDH=y
+   CONFIG_CRYPTO_ECDSA=m
+   CONFIG_CRYPTO_ECRDSA=m
+   CONFIG_CRYPTO_ECB=y
+   CONFIG_CRYPTO_ECHAINIV=m
+   ```
+
+1. Confirm that the kernel detects SEV-SNP:
+
+   ```console
+   $ sudo dmesg | grep -i -e rmp -e sev
+   [    0.000000] SEV-SNP: RMP table physical range [0x0000000088900000 - 0x00000000a8efffff]
+   [    6.072556] ccp 0000:45:00.1: sev enabled
+   [    6.195348] ccp 0000:45:00.1: SEV firmware updated from 1.49.3 to 1.55.21
+   [    7.793012] ccp 0000:45:00.1: SEV API:1.55 build:21
+   [    7.793024] ccp 0000:45:00.1: SEV-SNP API:1.55 build:21
+   [    7.806923] kvm_amd: SEV enabled (ASIDs 100 - 509)
+   [    7.806926] kvm_amd: SEV-ES enabled (ASIDs 1 - 99)
+   [    7.806929] kvm_amd: SEV-SNP enabled (ASIDs 1 - 99)
+   ```
+
+   If the output doesn't show that SEV-SNP is enabled, review the BIOS settings in [Configuring the Hardware](./deploy-hardware.mdx).
+   If the output reports that SEV-SNP requires a newer firmware version, [upgrade the SEV firmware](#upgrading-the-sev-firmware).
+
+1. Confirm that KVM enables SEV, SEV-ES, and SEV-SNP.
+   Each command prints `Y`:
+
+   ```console
+   $ cat /sys/module/kvm_amd/parameters/sev
+   Y
+   $ cat /sys/module/kvm_amd/parameters/sev_es
+   Y
+   $ cat /sys/module/kvm_amd/parameters/sev_snp
+   Y
+   ```
+
+### Upgrading the SEV Firmware
+
+SEV-SNP requires SEV firmware version 1.51 or later.
+If the firmware is older, the `dmesg` output is similar to the following example:
+
+```output
+[    0.564845] SEV-SNP: RMP table physical address 0x0000000088900000 - 0x00000000a8efffff
+[    3.257600] ccp 0000:45:00.1: sev enabled
+[    3.274785] ccp 0000:45:00.1: SEV-SNP support requires firmware version >= 1:51
+[    3.284535] ccp 0000:45:00.1: SEV: failed to INIT error 0x1, rc -5
+[    3.284541] ccp 0000:45:00.1: SEV API:1.49 build:3
+[    3.424129] SEV supported: 410 ASIDs
+[    3.424130] SEV-ES and SEV-SNP supported: 99 ASIDs
+```
+
+The latest SEV firmware is available from [AMD](https://developer.amd.com/sev) and from the `linux-firmware` project.
+The following steps install the firmware for AMD family 19h, model 0xh CPUs.
+For other CPU generations and newer firmware versions, refer to the AMD documentation.
+
+1. Download the firmware, copy the firmware to `/lib/firmware/amd`, and reboot:
+
+   ```console
+   $ wget https://developer.amd.com/wp-content/resources/amd_sev_fam19h_model0xh_1.33.03.zip
+   $ unzip amd_sev_fam19h_model0xh_1.33.03.zip
+   $ sudo mkdir -p /lib/firmware/amd
+   $ sudo cp amd_sev_fam19h_model0xh_1.33.03.sbin /lib/firmware/amd/amd_sev_fam19h_model0xh.sbin
+   $ sudo reboot
+   ```
+
+1. After the host reboots, confirm that the firmware update succeeded:
+
+   ```console
+   $ sudo dmesg | grep -i -e rmp -e sev
+   [    0.768000] SEV-SNP: RMP table physical address 0x0000000035600000 - 0x0000000075bfffff
+   [    3.868558] ccp 0000:45:00.1: sev enabled
+   [    3.918694] ccp 0000:45:00.1: SEV firmware update successful
+   [    7.315402] ccp 0000:45:00.1: SEV API:1.51 build:3
+   [    7.315410] ccp 0000:45:00.1: SEV-SNP API:1.51 build:3
+   [    7.322019] SEV supported: 410 ASIDs
+   [    7.322019] SEV-ES and SEV-SNP supported: 99 ASIDs
+   ```
+
+1. Confirm that KVM enables SEV, SEV-ES, and SEV-SNP, as described in the previous section.
+
+## Configuring TDX on Intel Hosts
+
+Intel and Canonical provide scripts that help you set up the host and the guest.
+
+1. Download the Canonical TDX scripts:
+
+   ```console
+   $ cd /shared
+   $ wget https://github.com/canonical/tdx/archive/refs/tags/3.3.zip
+   $ unzip 3.3.zip
+   $ mv tdx-3.3 tdx
+   ```
+
+1. Edit `/etc/default/grub` and set the kernel command line:
+
+   ```text
+   GRUB_CMDLINE_LINUX="nohibernate kvm_intel.tdx=1"
+   ```
+
+1. Update GRUB:
+
+   ```console
+   $ sudo update-grub
+   $ sudo grub-install --no-nvram
+   ```
+
+1. Add your user to the `kvm` group and reboot:
+
+   ```console
+   $ LOG_USER=$(logname)
+   $ if [ -n "$LOG_USER" ] && [ "$LOG_USER" != "root" ]; then sudo usermod -aG kvm "$LOG_USER"; fi
+   $ sudo reboot
+   ```
+
+1. Confirm that the kernel detects TDX and initializes the TDX Module.
+   Your TDX Module version can differ from the example:
+
+   ```console
+   $ sudo dmesg | grep -i tdx
+   [   10.162072] virt/tdx: BIOS enabled: private KeyID range [64, 128)
+   [   10.162074] virt/tdx: Disable ACPI S3. Turn off TDX in the BIOS to use ACPI S3.
+   [   21.678799] virt/tdx: TDX module 1.5.06.00, build number 744, build date 0134d817
+   [   26.540654] virt/tdx: 8405028 KB allocated for PAMT
+   [   26.540658] virt/tdx: module initialized
+   ```
+
+   If the output includes an error such as `SEAMCALL (0x0000000000000022) failed: 0xc0000c0000000000`, the TDX Module is out of date.
+   Contact your OEM for an updated BIOS, refer to [Updating Your Intel TDX Module](https://github.com/intel/confidential-computing-documentation/blob/main/docs/intel-tdx-enabling-guide/04/hardware_setup.md#updating-your-intel-tdx-module), or [update the TDX Module](#updating-the-tdx-module).
+
+### Updating the TDX Module
+
+1. Download the TDX Module for your CPU.
+
+   - Emerald Rapids:
+
+     ```console
+     $ cd /shared
+     $ wget https://github.com/intel/tdx-module/releases/download/TDX_1.5.16/intel_tdx_module.tar.gz
+     ```
+
+   - Granite Rapids:
+
+     ```console
+     $ cd /shared
+     $ wget https://github.com/intel/confidential-computing.tdx.tdx-module/releases/download/TDX_2.0.08/intel_tdx_module.tar.gz
+     ```
+
+1. Install the TDX Module in the EFI system partition and reboot:
+
+   ```console
+   $ tar -xvzf intel_tdx_module.tar.gz
+   $ sudo mkdir -p /boot/efi/EFI/TDX/
+   $ sudo cp TDX-Module/intel_tdx_module.so /boot/efi/EFI/TDX/TDX-SEAM.so
+   $ sudo cp TDX-Module/intel_tdx_module.so.sigstruct /boot/efi/EFI/TDX/TDX-SEAM.so.sigstruct
+   $ sudo reboot
+   ```
+
+## Loading the VFIO Modules Automatically
+
+[Linux Virtual Function I/O (VFIO)](https://docs.kernel.org/driver-api/vfio.html) is the passthrough driver that binds a GPU on the host to a guest VM.
+The `ib_umad` module controls the NVLink Switches in multi-GPU Blackwell systems.
+
+Create the `/etc/modules-load.d/vfio.conf` file with the following content so that the modules load at boot and are ready for the NVIDIA GPUs and NVLink Switches:
+
+```text
+vfio
+vfio_pci
+ib_umad
+```
+
+## Preventing NVIDIA Drivers from Loading on the Host
+
+Create the `/etc/modprobe.d/blacklist-nvidia.conf` file with the following content:
+
+```text
+blacklist nvidia
+blacklist nvidia_drm
+blacklist nvidia_modeset
+blacklist nvidia_uvm
+blacklist nouveau
+```
+
+## Installing Fabric Manager for Multi-GPU Blackwell Systems
+
+Multi-GPU CC mode on Blackwell GPUs requires NVIDIA Fabric Manager.
+You can run Fabric Manager in a maintenance VM or in the guest VM.
+The following steps install Fabric Manager on the host.
+
+1. Install Fabric Manager:
+
+   ```console
+   $ sudo apt install nvidia-fabricmanager
+   ```
+
+   If the package isn't available, enable the Ubuntu `-proposed` repository and run the command again:
+
+   ```console
+   $ sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu noble-proposed main restricted universe multiverse"
+   ```
+
+   <Warning>
+   Beginning with driver branch 590, the Ubuntu package names don't include the branch number.
+   To switch branches, install specific driver versions, or upgrade and downgrade, use the version-locking (pinning) packages.
+   Refer to [Ubuntu 590 and later packages](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/recent-updates.html#recent-updates-ubuntu-590) in the NVIDIA Driver Installation Guide.
+   </Warning>
+
+1. Edit `/usr/share/nvidia/nvswitch/fabricmanager.cfg` and change `PARTITION_RAIL_POLICY=greedy` to `PARTITION_RAIL_POLICY=symmetric`.
+   CC mode on Blackwell GPUs requires the symmetric rail policy.
+
+1. Enable and start Fabric Manager:
+
+   ```console
+   $ sudo systemctl enable nvidia-fabricmanager
+   $ sudo systemctl restart nvidia-fabricmanager
+   ```
+
+After you configure the host, continue with [Configuring the GPUs](./deploy-gpu-mode.mdx).

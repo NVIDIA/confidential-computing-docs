@@ -67,11 +67,11 @@ products:
 
   - display-name: Confidential Virtual Machine
     subtitle: Confidential VM deployments
-    path: ./products/cvm/current.yml
-    slug: cvm
+    path: ./products/virtual-machines/current.yml
+    slug: virtual-machines
     versions:
       - display-name: Dev
-        path: ./products/cvm/current.yml
+        path: ./products/virtual-machines/current.yml
         slug: dev
         availability: beta
 
