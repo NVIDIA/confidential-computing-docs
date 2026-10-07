@@ -38,9 +38,8 @@ navigation:
       - page: Overview
         path: ../../pages/platform/index.mdx
         slug: ""
-      - page: Attestation
-        path: ../../pages/platform/attestation.mdx
-        slug: attestation
+      - link: Attestation
+        href: https://docs.nvidia.com/attestation/#overview
       - page: Verifier
         path: ../../pages/platform/verifier.mdx
         slug: verifier
