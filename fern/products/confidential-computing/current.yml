@@ -9,7 +9,7 @@ navigation:
       - page: Overview
         path: ../../pages/overview/index.mdx
         slug: ""
-      - page: Positioning
+      - page: Deployment Modalities
         path: ../../pages/overview/positioning.mdx
         slug: positioning
       - page: Threat Model Comparison
@@ -19,7 +19,7 @@ navigation:
         path: ../../pages/overview/hopper-blackwell-capabilities.mdx
         slug: gpu-capabilities
 
-  - section: Deployment Models
+  - section: Modalities
     slug: ""
     contents:
       - link: Confidential Bare Metal
