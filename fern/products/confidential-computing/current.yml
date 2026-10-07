@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/product-yml.schema.json
 # Landing product: Dev navigation for the overview, concepts, and shared
 # guides (former "Platform Guides"). Product-specific material lives in the
 # bare-metal, virtual-machines, and containers products, each with its own version list.
@@ -12,12 +13,6 @@ navigation:
       - page: Positioning
         path: ../../pages/overview/positioning.mdx
         slug: positioning
-      - page: Threat Model Comparison
-        path: ../../pages/overview/threat-model-comparison.mdx
-        slug: threat-model
-      - page: Hopper and Blackwell CC Capabilities
-        path: ../../pages/overview/hopper-blackwell-capabilities.mdx
-        slug: gpu-capabilities
 
   - section: Deployment Models
     slug: ""

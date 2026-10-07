@@ -6,7 +6,7 @@ The documentation treats each deployment modality as a product with an independe
 
 | Product | Slug | Pages |
 | --- | --- | --- |
-| Confidential Computing (landing) | `/` | Overview, Positioning, Threat Model Comparison, Hopper and Blackwell CC Capabilities; Guides: Attestation, Verifier, Compatibility Matrix |
+| Confidential Computing (landing) | `/` | Overview, Deployment Modalities, Guides: Attestation, Platform Compatibility Matrix |
 | Confidential Bare Metal | `/bare-metal` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
 | Confidential Virtual Machine | `/virtual-machines` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
 | Confidential Containers | `/containers` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |

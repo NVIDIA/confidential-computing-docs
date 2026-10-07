@@ -14,6 +14,7 @@ navigation:
       - section: Deployment Guide
         path: ../../pages/virtual-machines/deployment-guide.mdx
         slug: deployment-guide
+        collapsed: open-by-default
         contents:
           - page: Configuring the Hardware
             path: ../../pages/virtual-machines/deploy-hardware.mdx
@@ -33,12 +34,3 @@ navigation:
           - page: Attesting the GPU
             path: ../../pages/virtual-machines/deploy-attest.mdx
             slug: attest
-      - page: Reference Architecture
-        path: ../../pages/virtual-machines/reference-architecture.mdx
-        slug: reference-architecture
-      - page: Playbooks
-        path: ../../pages/virtual-machines/playbooks.mdx
-        slug: playbooks
-      - page: Performance
-        path: ../../pages/virtual-machines/performance.mdx
-        slug: performance
