@@ -64,11 +64,11 @@ For maximum CVM performance on Intel CPUs, NVIDIA recommends the following setti
 
 ## Validating SEV-SNP on AMD Hosts
 
-1. Confirm that the host runs kernel 6.14 or later:
+1. Confirm that the host runs kernel 7.0 or later:
 
    ```console
-   $ uname -r
-   6.14.0-15-generic
+   $ uname -rm
+   7.0.0-22-generic x86_64
    ```
 
 1. Confirm that the kernel is configured with the elliptic curve cryptography options:

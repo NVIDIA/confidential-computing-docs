@@ -119,7 +119,7 @@ The Canonical TDX scripts that you downloaded in [Configuring the Host](./deploy
 
    ```console
    $ cd /shared
-   $ wget https://releases.ubuntu.com/24.04.2/ubuntu-24.04.2-live-server-amd64.iso
+   $ wget https://releases.ubuntu.com/noble/ubuntu-24.04.5-live-server-amd64.iso
    ```
 
 1. Create a virtual disk for the VM.
@@ -138,7 +138,7 @@ The Canonical TDX scripts that you downloaded in [Configuring the Host](./deploy
    MEM=32G
    VDD_IMAGE=/shared/ubuntu.qcow2
    FWDPORT=9899
-   CDROM=/shared/ubuntu-24.04.2-live-server-amd64.iso
+   CDROM=/shared/ubuntu-24.04.5-live-server-amd64.iso
 
    doecho=false
    docc=true
