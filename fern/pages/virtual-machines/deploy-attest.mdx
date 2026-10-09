@@ -14,8 +14,8 @@ After attestation succeeds, set the GPU ready state.
 <Note>
 The GPU doesn't accept work until a user in the CVM sets the ready state.
 This restriction prevents use of the GPU before you confirm that the GPU is trustworthy.
-A successful attestation that runs as root sets the ready state.
-You can also set the ready state with the following command:
+A succcessful attestation does not set the ready state automatically.
+After attestation succeeds, set the ready state with the following command:
 
 ```console
 $ nvidia-smi conf-compute -srs 1
@@ -46,8 +46,9 @@ $ nvidia-smi conf-compute -srs 1
 
 ## Attesting the GPU
 
-1. Install the attestation SDK and attest the GPU.
-   Refer to the [NVIDIA nvtrust guest tools](https://github.com/NVIDIA/nvtrust/tree/main/guest_tools/) for the verifier and attestation SDK.
+1. Install the NVIDIA Attestestion SDK (NVAT) and attest the GPU.
+   Refer to the [NVAT documentation](https://docs.nvidia.com/attestation/nv-attestation-sdk-cpp/latest/overview.html)
+   for installation and attestation instructions.
 
 1. After attestation succeeds, enable the GPU to accept work:
 
