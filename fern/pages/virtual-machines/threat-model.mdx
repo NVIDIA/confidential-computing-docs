@@ -1,0 +1,114 @@
+---
+title: "Trust and Threat Model"
+description: "Understand the trusted components, responsibilities, mitigated threats, and limits of a confidential VM with NVIDIA Hopper or Blackwell GPUs."
+template-library-version: "1.0.0"
+sidebar-title: "Trust and Threat Model"
+---
+
+A confidential VM (CVM) with NVIDIA GPUs protects a tenant's code, models, secrets, and data while they are in use, within the supported platform's threat model.
+The CPU trusted execution environment (TEE) isolates the VM from privileged host software, and GPU Confidential Computing extends protection to the attached GPUs and supported communication paths.
+
+The tenant, or CVM owner, controls the software inside the guest and decides which platform and software states to trust.
+The infrastructure owner operates the host and provisions GPUs without needing access to the tenant's protected contents.
+This page explains what that separation protects and which dependencies remain trusted.
+
+## Scope and GPU Modes
+
+The CPU TEE is provided by [Intel TDX](https://www.intel.com/content/www/us/en/developer/tools/trust-domain-extensions/documentation.html) or [AMD SEV-SNP](https://docs.amd.com/v/u/en-US/SEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more); its protections and exclusions follow the CPU vendor's threat model.
+GPU protections depend on the GPU architecture, security mode, firmware, and driver versions.
+Use [Supported Platforms](./supported-platforms.mdx) to identify validated configurations.
+
+The GPU modes covered by this documentation differ in how they protect communication:
+
+| Configuration | CPU-to-GPU traffic | GPU-to-GPU traffic |
+| --- | --- | --- |
+| Single-GPU CC mode, Hopper or Blackwell | Encrypted | Not applicable |
+| Multi-GPU CC mode, Blackwell | Encrypted | Encrypted over NVLink |
+| Multi-GPU Protected PCIe (PPCIe) mode, Hopper | Encrypted | Unencrypted over NVLink |
+
+The [NVIDIA Secure AI whitepaper](https://docs.nvidia.com/nvidia-secure-ai-with-blackwell-and-hopper-gpus-whitepaper.pdf) describes these modes and their interconnect protections.
+For Hopper PPCIe, the unencrypted NVLink path means that the assessment must also account for protection of the fabric, including NVSwitch and physical access.
+CPU-to-GPU encryption alone does not establish confidentiality on that path.
+
+## Trust and Responsibilities
+
+These are functional roles; one organization can fill several roles.
+In a deployment protecting a model owner's intellectual property, the model owner can act as the tenant.
+
+| Party | Controls or provides | Responsibility or trust dependency |
+| --- | --- | --- |
+| Tenant / CVM owner | Guest OS, NVIDIA guest driver, CUDA stack, workload, protected assets, and attestation policy | Approves and secures guest software and administrative access; decides when secrets can be released. |
+| Infrastructure owner / cloud service provider | Host OS, hypervisor, GPU assignment, platform management, power, and scheduling | Provisions and operates the platform. Host administration is treated as potentially malicious; availability remains dependent on the operator. |
+| CPU vendor | CPU hardware, TDX module or SEV-SNP firmware, and CPU attestation | Supplies VM isolation and CPU evidence within the vendor's threat model. |
+| NVIDIA | GPU hardware, root of trust, signed firmware, guest driver, and attestation reference values | Supplies GPU isolation, protected communication, and GPU evidence. NVIDIA does not approve the tenant's workload. |
+| OEM / system integrator | Server platform and firmware integration | Integrates a supported configuration; platform dependencies must be evaluated against the CPU and GPU security requirements. |
+| Verifier and key-release service operators | Evidence appraisal, secret storage, and release-policy enforcement | Apply the tenant's policy and deliver secrets to the approved recipient. These services and their policy administrators remain trusted. |
+
+An end user of a tenant's service supplies inputs and receives outputs.
+The CVM boundary does not isolate that user's data from the tenant or from software the tenant runs.
+
+## Runtime Trust Boundary
+
+The trusted computing base (TCB) comprises the components whose correct behavior is required to protect the workload:
+
+- **CPU TEE:** CPU hardware and the security module or firmware that isolate private VM memory and CPU state.
+- **Guest software:** Guest firmware, kernel, NVIDIA driver, CUDA libraries, workload, and any software or administrators with access to protected assets inside the guest.
+- **GPU:** GPU hardware, its root of trust, and NVIDIA-signed firmware enforcing the selected mode.
+- **Attestation and key services:** The verifier, its reference values and policies, and services that hold or release secrets, even when they run outside the CVM.
+
+The host OS, hypervisor, virtual machine monitor, and other tenants are outside this runtime trust boundary.
+Host management access through BIOS/UEFI or the baseboard management controller (BMC) does not make those interfaces trusted recipients of workload data.
+Their permitted access and the fabric assumptions depend on the selected platform and GPU mode.
+
+Each GPU is assigned whole to one CVM.
+Within GPU memory, hardware access controls protect plaintext data; GPU memory encryption is not the protection mechanism.
+The guest driver establishes a protected session with each GPU.
+In the bounce-buffer path, shared CPU memory carries ciphertext between the guest and GPU, while private VM memory remains protected by the CPU TEE.
+
+Trust and measurement coverage are distinct: guest software remains trusted even when a particular attestation flow does not measure every component.
+The tenant must establish how its boot and workload-loading process authenticates the software and configuration that receive secrets.
+
+## Threats and Mitigations
+
+The following protections assume a validated configuration and a tenant policy that accepts the actual CPU, GPU, software, and security mode.
+
+| Threat or access path | Protection | Remaining condition or limit |
+| --- | --- | --- |
+| Host administrator or another tenant attempts to read or alter workload memory | The CPU TEE isolates private VM state; GPU access controls and protected sessions restrict access to GPU state. | Guest administrators and software inside the CVM remain trusted. |
+| An adversary observes, modifies, or replays protected CPU-to-GPU traffic | Authenticated encryption protects payloads; session counters detect replay and keys rotate before counter exhaustion. | This does not extend encryption to Hopper PPCIe's NVLink traffic or to unrelated network and storage paths. |
+| The platform supplies unapproved or older GPU firmware | GPU secure boot requires NVIDIA-signed firmware; attestation allows the verifier to appraise identity, measurements, mode, and certificate status. | A valid signature alone does not establish that a firmware version is acceptable. The tenant's policy must reject disallowed versions. |
+| An administrator uses GPU management or debug interfaces to inspect workload data | In CC-On mode, management paths expose limited health information, JTAG is disabled, and performance counters are blocked. | CC-DevTools permits profiling access and must be excluded from a production policy that requires these restrictions. |
+| A subsequent tenant attempts to recover data from a previous GPU session | Session keys are ephemeral, and GPU reset and teardown mechanisms clear protected state. | Follow the supported GPU reset and reassignment lifecycle; stopping a workload is not a substitute for that lifecycle. |
+
+## Attestation and Secret Release
+
+The infrastructure owner selects the platform and assigns GPUs; the tenant decides whether to trust the resulting environment.
+Before releasing model-decryption keys or other secrets, the tenant's verification and release flow must:
+
+1. Verify CPU evidence against the tenant's policy for the CPU TEE and guest launch state.
+2. Verify evidence for every assigned GPU, including identity, firmware measurements, security mode, reference values, and certificate status.
+3. Establish that the approved guest software and configuration will receive the secrets, using the deployment's authenticated boot and workload-loading mechanisms.
+4. Release secrets over a protected channel to that approved recipient only when all required checks succeed.
+
+A successful GPU attestation does not validate the CPU TEE or the tenant's workload.
+Likewise, CPU evidence alone does not establish the state of the attached GPUs.
+The release policy must cover both and reject configurations that do not meet the tenant's requirements.
+
+In the documented deployment flow, a user in the CVM sets the GPU ready state after successful attestation.
+Attestation does not set that state automatically, and the ready state itself is not evidence that the tenant's release policy has been satisfied.
+Refer to [Attesting the GPU](./deploy-attest.mdx) for the procedure.
+
+## Limits and Exclusions
+
+- **Tenant software and policy:** Vulnerabilities, malicious guest code, permissive release policies, sensitive logging, and permitted debugging can expose protected assets. Attestation does not establish that approved code is free of vulnerabilities.
+- **Availability:** The infrastructure owner can stop the CVM, interrupt networking, detach devices, or remove power. Confidential Computing does not guarantee service availability against that operator.
+- **Physical attacks and side channels:** Invasive package probing and fault injection are outside this GPU threat model. CPU side-channel coverage follows the CPU vendor's model. Interconnect protection must be assessed for the selected GPU mode.
+- **Network, storage, and other devices:** Protect data that leaves the CVM and its assigned GPUs separately, including network connections and stored artifacts. Do not infer protection for another device from GPU attestation.
+- **GPU sharing and unsupported paths:** This model assumes whole-GPU assignment to one CVM. MIG, MPS, and GPUDirect RDMA are not supported in the CC configurations described here; consult the supported configuration documentation as capabilities evolve.
+- **Trusted-component vulnerabilities:** CPU or GPU security flaws can affect the boundary. Track vendor advisories, update affected components, and revise accepted reference values and security versions as required.
+
+## Related Topics
+
+- [Deployment Guide](./deployment-guide.mdx): Configure the host, guest, and GPUs.
+- [Configuring the GPUs](./deploy-gpu-mode.mdx): Select and activate the GPU mode.
+- [NVIDIA Attestation](https://docs.nvidia.com/attestation/): Evidence verification, reference values, and attestation services.

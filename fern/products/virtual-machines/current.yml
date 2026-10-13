@@ -34,3 +34,6 @@ navigation:
           - page: Attesting the GPU
             path: ../../pages/virtual-machines/deploy-attest.mdx
             slug: attest
+      - page: Trust and Threat Model
+        path: ../../pages/virtual-machines/threat-model.mdx
+        slug: threat-model
