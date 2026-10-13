@@ -53,22 +53,24 @@ layout: custom
   <Card title="Threat Model Comparison" icon="fa-solid fa-shield-halved" href="/confidential-computing/threat-model">
     What each model protects against, and what stays in the trust boundary.
   </Card>
-  <Card title="Attestation" icon="fa-solid fa-fingerprint" href="https://docs.nvidia.com/attestation/#overview">
-    How a workload proves it runs on genuine, correctly configured hardware.
-  </Card>
-  <Card title="GPU Capabilities" icon="fa-solid fa-microchip" href="/confidential-computing/gpu-capabilities">
-    Confidential computing features by GPU generation.
-  </Card>
 </Cards>
 
 ## Guides
 
 <Cards cols={2}>
-  <Card title="Verifier" icon="fa-solid fa-circle-check" href="/confidential-computing/guides/verifier">
-    Verify attestation evidence and enforce policy.
+  <Card title="Attestation" icon="fa-solid fa-fingerprint" href="https://docs.nvidia.com/attestation/#overview">
+    How a workload proves it runs on genuine, correctly configured hardware.
   </Card>
-  <Card title="Compatibility Matrix" icon="fa-solid fa-table-cells" href="/confidential-computing/guides/compatibility-matrix">
+  <Card title="Platform Compatibility Matrix" icon="fa-solid fa-table-cells" href="https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/">
     Supported GPUs, CPUs, drivers, and software versions.
+  </Card>
+</Cards>
+
+## Related Software
+
+<Cards cols={2}>
+  <Card title="Attestation SDK" icon="fa-solid fa-circle-check" href="https://github.com/nvidia/attestation-sdk">
+    Resources for implementing and validating trusted computing on NVIDIA hardware.
   </Card>
 </Cards>
 

@@ -40,9 +40,11 @@ navigation:
         slug: ""
       - link: Attestation
         href: https://docs.nvidia.com/attestation/#overview
-      - page: Verifier
-        path: ../../pages/platform/verifier.mdx
-        slug: verifier
-      - page: Compatibility Matrix
-        path: ../../pages/platform/compatibility-matrix.mdx
-        slug: compatibility-matrix
+      - link: Platform Compatibility Matrix
+        href: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/
+
+  - section: Resources
+    slug: resources
+    contents:
+      - link: Attestation SDK
+        href: https://github.com/nvidia/attestation-sdk
