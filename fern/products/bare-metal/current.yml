@@ -8,3 +8,6 @@ navigation:
       - page: Overview
         path: ../../pages/bare-metal/index.mdx
         slug: ""
+      - page: Trust and Threat Model
+        path: ../../pages/bare-metal/threat-model.mdx
+        slug: threat-model

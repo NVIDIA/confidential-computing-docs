@@ -1,102 +1,74 @@
 ---
 title: "Confidential Bare Metal"
 sidebar-title: "Overview"
-description: "The Confidential Bare Metal (CBM) deployment modality provides NVIDIA Confidential Computing for tenant-dedicated bare-metal hosts, with platform security controls and verified trust."
+description: "NVIDIA Confidential Bare Metal (CBM) provides tenant-operated AI infrastructure with verified platform trust."
 ---
 
-The Confidential Bare Metal (CBM) deployment modality provides NVIDIA Confidential Computing for tenant-dedicated bare-metal hosts.
-In CBM, the model owner receives the whole host and operates the software infrastructure inside the model owner's own trust boundary.
-For a comparison of CBM with the other modalities, refer to [Deployment Modalities](/confidential-computing/positioning).
+NVIDIA Confidential Bare Metal (CBM) extends NVIDIA Confidential Computing to dedicated bare-metal infrastructure.
+It combines measured launch, platform attestation, and platform security controls so a tenant can appraise its environment against policy before releasing model weights, data, and runtime secrets.
 
-CBM does not use a CPU trusted execution environment, because no separate host tenant exists to isolate the workload from.
-Instead, CBM provides attested platform integrity and defense-in-depth protection through the following mechanisms:
+CBM is designed for AI labs and model providers that want to own and operate the entire software stack.
+The tenant controls the host OS, kernel, drivers, any hypervisor or Kubernetes platform, and the AI workload.
+The infrastructure owner, such as a cloud or neo-cloud provider, supplies dedicated infrastructure and performs data center operations.
+After handoff and attestation appraisal, the infrastructure owner remains outside the tenant's runtime trust boundary.
 
-- Platform attestation.
-- GPU Confidential Computing protections.
-- Platform security controls.
+The tenant's own privileged administrators and software remain trusted.
+CBM does not isolate the workload or protect end-user data from those parties.
 
-## Intended Audience
+The tenant controls remote attestation policy and key management.
+The verifier and key service remain trusted for evidence appraisal and key-release authorization, even when deployed outside the host.
 
-CBM is designed for organizations that build and operate their own software infrastructure on dedicated hardware.
-CBM is appropriate for an organization that meets the following conditions:
+![CBM architecture and responsibilities, including tenant controls, the tenant-operated trust boundary, infrastructure owner operations, and tenant trust policy.](./_images/cbm-architecture-responsibilities.svg)
 
-- The organization receives entire hosts as a single tenant and manages the hosts directly.
-- The organization builds, signs, and maintains a custom operating system image.
-- The organization operates the infrastructure for workload launch, multi-node bootstrapping, and NVLink partitioning.
-- The organization develops and operates an appraisal software for attestation, which can include a custom verifier.
+## CBM Deployment Model
 
-If your workloads run on infrastructure that a provider operates, refer to [Confidential Virtual Machine](/confidential-computing/cvm) or [Confidential Containers](/confidential-computing/containers).
+CBM places a dedicated host under one tenant organization's control.
+The infrastructure owner prepares the platform while the tenant prepares its software images and trust policy.
+CBM does not require a confidential virtual machine (CVM).
 
-## Personas and Responsibilities
+- **Handoff:** Measured launch and attestation provide evidence for the tenant's appraisal. Key release is gated by tenant policy, including workload requirements beyond the hardware evidence.
+- **Tenant operation:** The tenant builds and hardens the host OS, kernel, and drivers, deploys required platform software, and operates the AI workload.
+- **Lifecycle:** The tenant manages updates, monitoring, storage and network protection, and remote keys. The tenant re-attests after resets and relevant changes before authorizing secret release.
 
-CBM divides responsibilities between the provider or operator and the model owner or AI lab.
-The following table describes each persona and the responsibilities of that persona in a CBM deployment:
+![CBM provisioning and runtime flow, from independent platform and trust-policy preparation through handoff, evidence appraisal, key release, workload operation, and tenancy reset.](./_images/cbm-provisioning-runtime-flow.svg)
 
-| Persona | Description | Responsibilities in CBM |
+## Personas
+
+The tenant is the AI lab or model-provider organization that is accountable for the complete software stack and trust policy.
+The platform infrastructure administrator and workload owner are functions within that organization, not independent trust domains.
+One organization can fill several roles.
+
+The following table describes the CBM personas and their responsibilities:
+
+| Persona | Organization or Scope | Responsibility and Trust Limit |
 | --- | --- | --- |
-| Provider or operator | The organization that owns or operates the host infrastructure. | Procures the systems from one or more OEMs, installs the system firmware, and delivers dedicated hosts to the model owner. |
-| Model owner or AI lab | The organization that owns the model, the workload, the data, the keys, the attestation policy, and the security requirements. | Builds the operating system image, configures the hardware and the GPUs, operates the software infrastructure, and appraises the attestation evidence. |
-| Tenant end user | The downstream user or application tenant whose prompts, inference inputs, inference outputs, and application data require protection. | No direct responsibilities. The protection for tenant end-user data depends on how the model owner deploys the workload. |
+| Cloud infrastructure administrator | Infrastructure owner | Prepares hardware and firmware. Operates power, cooling, the baseboard management controller (BMC), fabric, and storage infrastructure. Remains responsible for availability and agreed physical safeguards. Does not administer tenant software or have authority to read runtime plaintext. |
+| Tenant | AI lab or model provider | Is accountable for software selection, accepted components and reference values, trust policy, remote keys, and lifecycle decisions. Assigns platform and workload functions within its organization. Its privileged access to plaintext is trusted. |
+| Platform infrastructure administrator | Function within the tenant | Builds, patches, and hardens the host OS, kernel, and drivers. Operates platform software and device access controls. Integrates attestation and key services under tenant policy. |
+| Workload owner | Function within the tenant | Owns model assets, serving or training software, workload configuration, and data-use rules. Defines workload access and model-key policy with the platform team. |
 
-## Trust Boundary
+A downstream user of the AI service is distinct from the infrastructure tenant.
+CBM does not protect that user's prompts, outputs, or other data from the tenant or its trusted serving software.
 
-After the model owner receives the dedicated host and verifies the platform state and the GPU state, the provider is outside the runtime trust boundary.
-The model owner remains responsible for operating the software infrastructure.
+## Threat Model
 
-CBM does not protect tenant end-user data from the model owner.
-To protect tenant end-user data from the model owner, the model owner must deploy an additional virtualized Confidential Computing layer inside the bare-metal trust boundary.
+CBM protects model weights, data, and keys on dedicated hosts from infrastructure-owner access to runtime plaintext.
+This protection includes management access through the BMC without tenant host OS credentials.
+Security claims depend on the deployed hardware, firmware, verified protection settings, and hardened tenant software.
 
-## Deployment Workflow
+The threat model covers the following areas:
 
-A CBM deployment follows these high-level stages:
+- **Runtime Trust Boundary:** The tenant trusts the approved software, hardware, firmware, verifier, and key service, while the infrastructure owner remains outside the runtime TCB.
+- **Measured Launch, Attestation, and Key Release:** DRTM and fresh platform evidence let the tenant verify the launched environment before its policy authorizes secure secret delivery.
+- **Protection Scope and Tenant Controls:** Platform protections cover supported memory and communication paths, while the tenant hardens software and protects storage, network, and RDMA data.
+- **Limits:** CBM does not protect against trusted tenant software and administrators, all physical or side-channel attacks, or infrastructure-owner denial of service.
 
-1. The provider sets up systems from one or more OEMs with the provider's UEFI firmware.
-1. The model owner prepares a signed operating system image on a secure build server.
-   The image contains the NVIDIA drivers and follows the NVIDIA reference image guidelines.
-1. The model owner configures the hardware, installs the operating system image, and sets the confidential compute mode of every GPU to Bare-Metal Secure AI by using the [NVIDIA GPU admin tools](https://github.com/NVIDIA/gpu-admin-tools).
-   The confidential compute mode takes effect after the next GPU reset.
-1. The model owner operates the infrastructure for creating NVLink partitions and for launching single-node and multi-node workloads.
-1. The model owner's software infrastructure performs multi-node bootstrapping, appraises the hardware and the software, and sets up the keys for NVLink encryption.
-   The software infrastructure can integrate with the NVIDIA Multinode Confidential Computing Daemon (`nvidia-mnccd`) for these tasks.
+For detailed threats, mitigations, assumptions, and exclusions, refer to [Trust and Threat Model](./threat-model.mdx).
 
-## Platform Security Controls
+## Platform Support and Caveats
 
-The model owner manages the following controls to set up a CBM environment:
+This release introduces CBM for NVIDIA Grace Blackwell rack-scale and NVIDIA Vera Rubin platforms.
+The ownership and trust model is consistent across both platforms, but hardware protections, attestation evidence, and integration requirements differ.
 
-| Control | Purpose | How the model owner enables the control |
-| --- | --- | --- |
-| Dynamic Root of Trust for Measurement (DRTM) | Provides a hardware-rooted, measured launch of the operating system. | Applies the NVIDIA operating system kernel patches that enable a secure boot with DRTM. |
-| CPU memory encryption | Encrypts CPU DRAM. | Enables CPU DRAM encryption at boot time in the BIOS setup. |
-| NVLink encryption | Protects the data that moves between GPUs over NVLink and through NVLink Switches. | Enables NVLink encryption as a persistent GPU setting by using the NVIDIA GPU admin tools. |
-| Confidential compute mode | The Bare-Metal Secure AI mode activates firewalls in the PCIe path that protect the contents of GPU memory. | Sets the confidential compute mode to Bare-Metal Secure AI as a persistent GPU setting by using the NVIDIA GPU admin tools. |
-
-## Attestation
-
-NVIDIA provides reference integrity manifests (RIMs) for the components that NVIDIA delivers: the CPU firmware, the GPU firmware, and the GPU microcode.
-The model owner owns all other software that runs on the CPU, including the operating system kernel and the kernel drivers.
-NVIDIA cannot attest the software that the model owner owns.
-
-The model owner is responsible for the attestation infrastructure, which includes the following tasks:
-
-- Appraising the attestation evidence for the hardware and the software.
-- Attesting multiple nodes.
-- Attesting the operating system and the model owner's software infrastructure.
-
-## Threats and Mitigations
-
-The following table compares how a conventional hypervisor, a confidential virtual machine (CVM), and CBM address each threat:
-
-| Threat | Description | Conventional hypervisor | CVM | CBM |
-| --- | --- | --- | --- | --- |
-| Untrusted UEFI or BIOS | The system firmware is not trusted. | Not protected | Protected | Protected by DRTM |
-| Physical attacks on NVLink | An attacker launches a physical attack on NVLink. | Not protected, or optionally protected | Protected | Protected by NVLink encryption |
-| Physical or software attacks on NVLink Switches | An attacker launches a hardware-based or software-based attack on an NVLink Switch. | Not protected | Protected by NVLink encryption | Protected by NVLink encryption |
-| Physical attacks on PCIe | An attacker launches a physical attack on the PCIe bus. | Not protected | Protected. Active physical bus attacks are out of scope. | Protected by GPU Confidential Computing protections. Active physical bus attacks are out of scope. |
-| Physical attacks on the CPU-to-GPU interconnect | An attacker launches a physical attack on the chip-to-chip (C2C) interconnect between the CPU and the GPU. | Not protected | Protected | Not protected |
-| Compromised hypervisor | An attacker compromises the hypervisor. | Not protected | Protected | Not applicable. CBM has no hypervisor layer. |
-
-## Engaging NVIDIA
-
-CBM deployments require significant investment in infrastructure and attestation by the model owner.
-NVIDIA works directly with each organization that adopts CBM.
-To discuss a CBM deployment, contact your NVIDIA account team.
+- Use a qualified hardware, firmware, and device configuration with the required security settings enabled. Protections are specific to the supported data paths.
+- Plan for substantial tenant engineering and ongoing ownership of the software stack, workload security, attestation, and remote key management.
