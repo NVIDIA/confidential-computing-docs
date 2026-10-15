@@ -24,15 +24,12 @@
     .column-label { fill: #425466; font: 700 18px Arial, Helvetica, sans-serif; letter-spacing: 0.4px; }
     .row { fill: #ffffff; stroke: #bfd0d9; stroke-width: 2; }
     .row-role { fill: #eef3f6; }
-    .row-highlight { fill: #f3f9f0; stroke: #76b900; stroke-width: 2; }
-    .row-role-highlight { fill: #e6f4de; }
     .step-role { fill: #152638; font: 700 18px Arial, Helvetica, sans-serif; }
     .step-role-copy { fill: #425466; font: 17px Arial, Helvetica, sans-serif; }
     .step-number { fill: #ffffff; font: 700 20px Arial, Helvetica, sans-serif; }
     .step-circle { fill: #006b85; }
     .step-circle-highlight { fill: #3f7f1f; }
     .step-title { fill: #152638; font: 700 20px Arial, Helvetica, sans-serif; }
-    .step-title-highlight { fill: #17633f; font: 700 20px Arial, Helvetica, sans-serif; }
     .step-copy { fill: #425466; font: 17px Arial, Helvetica, sans-serif; }
     .note { fill: #425466; font: 18px Arial, Helvetica, sans-serif; }
   </style>
@@ -105,12 +102,12 @@
   <text class="step-copy" x="400" y="808">Release keys only after policy passes. Bind the release path to the runtime.</text>
 
   <!-- Step 4 -->
-  <rect class="row-highlight" x="30" y="850" width="1140" height="95" />
-  <rect class="row-role-highlight" x="31" y="851" width="290" height="93" />
+  <rect class="row" x="30" y="850" width="1140" height="95" />
+  <rect class="row-role" x="31" y="851" width="290" height="93" />
   <text class="step-role" x="55" y="905">Tenant</text>
-  <circle class="step-circle-highlight" cx="360" cy="897" r="23" />
+  <circle class="step-circle" cx="360" cy="897" r="23" />
   <text class="step-number" x="360" y="904" text-anchor="middle">4</text>
-  <text class="step-title-highlight" x="400" y="883">Run Workload and Serve End Users</text>
+  <text class="step-title" x="400" y="883">Run Workload and Serve End Users</text>
   <text class="step-copy" x="400" y="913">Protect model assets, buffers, peer access, and data paths.</text>
 
   <!-- Step 5 -->
