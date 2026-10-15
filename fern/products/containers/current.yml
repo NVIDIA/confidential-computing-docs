@@ -73,5 +73,5 @@ navigation:
         path: ../../pages/containers/release-notes.mdx
         slug: release-notes
       - page: Licensing
-        path: ../../pages/containers/licensing.mdx
+        path: ../../pages/shared/licensing.mdx
         slug: licensing
