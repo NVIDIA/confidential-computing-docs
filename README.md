@@ -8,7 +8,7 @@ The documentation treats each deployment modality as a product with an independe
 | --- | --- | --- |
 | Confidential Computing (landing) | `/` | Overview, Deployment Modalities, Guides: Attestation, Platform Compatibility Matrix |
 | Confidential Bare Metal | `/bare-metal` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
-| Confidential Virtual Machine | `/virtual-machines` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
+| Confidential Virtual Machines | `/virtual-machines` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
 | Confidential Containers | `/containers` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
 
 To contribute, refer to [CONTRIBUTING.md](CONTRIBUTING.md). To report a

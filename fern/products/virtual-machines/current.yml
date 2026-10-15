@@ -1,8 +1,8 @@
-# Confidential Virtual Machine: Dev (working-tree) navigation. Release versions are
+# Confidential Virtual Machines: Dev (working-tree) navigation. Release versions are
 # listed by hand in fern/docs.yml.
 
 navigation:
-  - section: Confidential Virtual Machine
+  - section: Confidential Virtual Machines
     slug: ""
     contents:
       - page: Overview

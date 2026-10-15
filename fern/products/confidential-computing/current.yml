@@ -8,9 +8,12 @@ navigation:
   - section: Confidential Computing
     slug: ""
     contents:
-      - page: Overview
+      - page: Home
         path: ../../pages/overview/index.mdx
         slug: ""
+      - page: Overview
+        path: ../../pages/overview/overview.mdx
+        slug: overview
 
   - section: Deployment Modalities
     slug: ""
@@ -18,7 +21,7 @@ navigation:
       - link: Confidential Bare Metal
         href: /confidential-computing/bare-metal
         icon: fa-solid fa-server
-      - link: Confidential Virtual Machine
+      - link: Confidential Virtual Machines
         href: /confidential-computing/virtual-machines
         icon: fa-solid fa-cube
       - link: Confidential Containers
@@ -28,10 +31,10 @@ navigation:
   - section: Related Resources
     slug: resources
     contents:
-      - link: Platform Compatibility Matrix
-        href: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/
       - link: Attestation
         href: https://docs.nvidia.com/attestation/#overview
+      - link: Platform Compatibility Matrix
+        href: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/
       - link: Attestation SDK
         href: https://github.com/nvidia/attestation-sdk
       - page: Licensing
