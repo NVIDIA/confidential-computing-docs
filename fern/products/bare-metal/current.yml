@@ -11,3 +11,6 @@ navigation:
       - page: Trust and Threat Model
         path: ../../pages/bare-metal/threat-model.mdx
         slug: threat-model
+      - page: Licensing
+        path: ../../pages/shared/licensing.mdx
+        slug: licensing

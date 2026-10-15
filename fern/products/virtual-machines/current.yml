@@ -37,3 +37,6 @@ navigation:
       - page: Trust and Threat Model
         path: ../../pages/virtual-machines/threat-model.mdx
         slug: threat-model
+      - page: Licensing
+        path: ../../pages/shared/licensing.mdx
+        slug: licensing
