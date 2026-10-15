@@ -1,98 +1,83 @@
 ---
 title: "NVIDIA Confidential Computing"
-sidebar-title: "Overview"
-description: "Choose the NVIDIA Confidential Computing deployment model and trust boundary that fit your AI workload, infrastructure, and security requirements."
+sidebar-title: "Home"
+description: "Protect workloads and data in use on NVIDIA infrastructure."
+layout: custom
 ---
 
-NVIDIA Confidential Computing (CC) extends confidential computing to NVIDIA GPUs.
-It combines hardware, software, and services to protect AI workloads, model weights, and sensitive data during processing.
-These capabilities form a common foundation for confidential AI.
-Attestation is central to this foundation: its evidence supports trust decisions and policy-controlled release of secrets.
+<div className="cc-landing">
 
-Organizations can use this foundation through three deployment modalities: Confidential Bare Metal (CBM), Confidential Virtual Machines (CVMs), and Confidential Containers (CoCo).
-Each modality combines NVIDIA CC capabilities with a distinct operating model and trust boundary.
-Choose the modality that fits your infrastructure ownership, workload requirements, and security needs.
+<div className="cc-hero">
+  <p className="cc-eyebrow">Documentation</p>
+  <h1>NVIDIA Confidential Computing</h1>
+  <p className="cc-lede">
+    NVIDIA Confidential Computing extends confidential computing to NVIDIA GPUs.
+    Explore deployment modalities, trust boundaries, attestation, and platform support for protecting AI workloads and data in use.
+  </p>
+</div>
 
-## Use Cases
+## Overview
 
-NVIDIA Confidential Computing supports the following primary use cases:
+<Cards cols={1}>
+  <Card title="Confidential Computing Overview" icon="fa-solid fa-shield-halved" href="/confidential-computing/overview">
+    Compare use cases, deployment modalities, trust boundaries, and shared security capabilities.
 
-- **Protect Model Assets:** Deploy closed-source models or post-trained versions of open source models on enterprise or neo-cloud infrastructure outside the model owner's control. AI labs can release decryption keys only to workloads that satisfy attestation and launch policy, protecting proprietary weights and post-training investments.
-- **Protect Sensitive Data During Processing:** Protect sensitive enterprise data, including financial records, healthcare information, and personally identifiable information (PII), while AI workloads process it. The selected deployment model determines which infrastructure administrators are excluded. Protecting data from the model owner requires an additional appropriate boundary.
-- **Support Sovereign AI Adoption:** Run AI where data must remain, including approved local or regional infrastructure. Combined with data-residency, access, and governance controls, CC can support sovereignty requirements where moving sensitive data to an external cloud would otherwise be a barrier.
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+  </Card>
+</Cards>
 
 ## Deployment Modalities
 
-NVIDIA Confidential Computing defines three standard deployment modalities.
-Each modality has a distinct operating model and trust boundary.
-
-<img src="_images/threat-model-comparison.svg" alt="Three stacks share aligned platform and host OS layers. The trusted, tenant-controlled component rises from the host OS in bare metal to the guest OS in a confidential VM and the container in a confidential pod VM. Other tenants appear beside the guest and container. The adversary column aligns infrastructure administrators with the platform row, host administrators with the host OS and hypervisor row, and Kubernetes administrators with the control plane row." className="only-light" />
-<img src="_images/threat-model-comparison-dark.svg" alt="Three stacks share aligned platform and host OS layers. The trusted, tenant-controlled component rises from the host OS in bare metal to the guest OS in a confidential VM and the container in a confidential pod VM. Other tenants appear beside the guest and container. The adversary column aligns infrastructure administrators with the platform row, host administrators with the host OS and hypervisor row, and Kubernetes administrators with the control plane row." className="only-dark" />
-
+<div className="cc-products">
 <Cards cols={3}>
   <Card
     title="Confidential Bare Metal"
     icon="fa-solid fa-server"
     href="/confidential-computing/bare-metal"
   >
-    For AI labs and model providers that receive dedicated hosts and operate the complete software stack. The infrastructure owner remains outside the runtime trust boundary after handoff and successful appraisal.
+    Use your own software stack and protect workloads from the infrastructure owner.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
   </Card>
   <Card
-    title="Confidential Virtual Machines"
+    title="Confidential Virtual Machine"
     icon="fa-solid fa-cube"
     href="/confidential-computing/virtual-machines"
   >
-    For VM-based services where the model owner controls guest images and needs a persistent VM lifecycle. A confidential VM boundary isolates the workload from privileged host software.
+    Run GPU workloads in a confidential VM.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
   </Card>
   <Card
     title="Confidential Containers"
     icon="fa-solid fa-cubes"
     href="/confidential-computing/containers"
   >
-    For Kubernetes-native confidential workloads. A Kata microVM and CPU trusted execution environment isolate each confidential pod from the privileged host.
+    Deploy confidential pods on Kubernetes with the standard container workflow.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
   </Card>
 </Cards>
+</div>
 
-The deployment modalities do not provide interchangeable security guarantees.
-Protection depends on the actual topology, trusted software, and enforced policy.
-Each modality's documentation defines its supported configurations and availability.
+## Related Resources
 
-## Trust Boundaries and Threat Model
-
-The following comparison shows the trust boundaries at a glance.
-Each deployment modality moves the trust boundary to match who operates the infrastructure.
-
-<img src="_images/confidential-computing-trust-boundaries.svg" alt="Three cards compare Confidential Bare Metal, Confidential Virtual Machines, and Confidential Containers by what the tenant receives, the primary adversary, who runs the host OS, the primary hardware protection, and the main residual exposure." className="only-light" />
-<img src="_images/confidential-computing-trust-boundaries-dark.svg" alt="Three cards compare Confidential Bare Metal, Confidential Virtual Machines, and Confidential Containers by what the tenant receives, the primary adversary, who runs the host OS, the primary hardware protection, and the main residual exposure." className="only-dark" />
-
-These boundaries do not automatically protect end-user data from the model owner or eliminate shared-hardware, fabric, physical, or side-channel risks.
-Review the model-specific trust and threat documentation before approving a deployment or releasing secrets.
-
-## Shared Security Capabilities and Services
-
-Attestation, launch policy, and secret release connect platform security to workload requirements.
-Their integration and ownership depend on the selected deployment modality.
-
-### Attestation and Policy Evaluation
-
-CPU and GPU evidence, reference values, and identity information support appraisal of the environment against workload policy.
-Attestation provides evidence for a trust decision; it does not replace the policy that determines whether a workload can receive secrets.
-
-### Key Brokering and Secret Release
-
-A key broker service (KBS) releases secrets according to attestation and launch policy.
-The Trustee and KBS architecture connects evidence appraisal and secret retrieval through attesters and launch hooks specific to each deployment modality.
-
-### Launch Policy and Operational Security
-
-Trusted administration and workload-launch paths, hardened infrastructure software, device lifecycle management, networking, and observability support the selected boundary.
-Reference architectures and model-specific validation establish the required configuration and isolation checks.
-
-<Cards cols={2}>
-  <Card title="Attestation" icon="fa-solid fa-fingerprint" href="https://docs.nvidia.com/attestation/#overview">
-    Learn how workloads verify NVIDIA hardware and security configuration before releasing secrets.
-  </Card>
+<Cards cols={3}>
   <Card title="Platform Compatibility Matrix" icon="fa-solid fa-table-cells" href="https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/">
     Review supported GPUs, CPUs, drivers, and software versions.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+  </Card>
+  <Card title="Attestation" icon="fa-solid fa-fingerprint" href="https://docs.nvidia.com/attestation/#overview">
+    Learn how workloads verify NVIDIA hardware and security configuration before releasing secrets.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+  </Card>
+  <Card title="Attestation SDK" icon="fa-solid fa-circle-check" href="https://github.com/nvidia/attestation-sdk">
+    Access resources for implementing and validating trusted computing on NVIDIA hardware.
+
+    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
   </Card>
 </Cards>
+
+</div>

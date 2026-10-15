@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/product-yml.schema.json
-# Landing product: Dev navigation for the overview, deployment-model links,
-# and shared guides (former "Platform Guides"). Product-specific material
+# Landing product: Dev navigation for the overview, deployment-modality links,
+# and shared resources. Product-specific material
 # lives in the bare-metal, virtual-machines, and containers products, each
 # with its own version list.
 
@@ -8,11 +8,14 @@ navigation:
   - section: Confidential Computing
     slug: ""
     contents:
-      - page: Overview
+      - page: Home
         path: ../../pages/overview/index.mdx
         slug: ""
+      - page: Overview
+        path: ../../pages/overview/overview.mdx
+        slug: overview
 
-  - section: Deployment Models
+  - section: Deployment Modalities
     slug: ""
     contents:
       - link: Confidential Bare Metal
@@ -25,19 +28,12 @@ navigation:
         href: /confidential-computing/containers
         icon: fa-solid fa-cubes
 
-  - section: Guides
-    slug: guides
+  - section: Related Resources
+    slug: resources
     contents:
-      - page: Overview
-        path: ../../pages/platform/index.mdx
-        slug: ""
       - link: Attestation
         href: https://docs.nvidia.com/attestation/#overview
       - link: Platform Compatibility Matrix
         href: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/
-
-  - section: Resources
-    slug: resources
-    contents:
       - link: Attestation SDK
         href: https://github.com/nvidia/attestation-sdk
