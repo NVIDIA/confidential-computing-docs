@@ -65,7 +65,7 @@ products:
         slug: dev
         availability: beta
 
-  - display-name: Confidential Virtual Machine
+  - display-name: Confidential Virtual Machines
     subtitle: Confidential VM deployments
     path: ./products/virtual-machines/current.yml
     slug: virtual-machines

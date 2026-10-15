@@ -21,7 +21,7 @@ navigation:
       - link: Confidential Bare Metal
         href: /confidential-computing/bare-metal
         icon: fa-solid fa-server
-      - link: Confidential Virtual Machine
+      - link: Confidential Virtual Machines
         href: /confidential-computing/virtual-machines
         icon: fa-solid fa-cube
       - link: Confidential Containers
