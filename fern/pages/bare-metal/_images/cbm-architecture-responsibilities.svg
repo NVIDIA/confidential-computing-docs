@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">CBM architecture and responsibilities</title>
+  <desc id="desc">The tenant controls protected assets, security policy, attestation, and the remote key service. The tenant-operated trust boundary contains encrypted AI workloads, tenant-owned platform and host software, and NVIDIA Confidential Computing. The infrastructure owner operates NVIDIA accelerated infrastructure but is excluded from the runtime trust boundary.</desc>
+
+  <style>
+    .canvas { fill: #ffffff; }
+    .section-title { fill: #0f172a; font: 700 27px Arial, Helvetica, sans-serif; }
+    .group { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+    .tenant-boundary { fill: #e8f7d8; stroke: #76b900; stroke-width: 4; }
+    .tenant-box { fill: #f5faef; stroke: #76b900; stroke-width: 3; }
+    .infra-group { fill: #eaf5f8; stroke: #006b85; stroke-width: 3; }
+    .infra-box { fill: #f2f9fb; stroke: #006b85; stroke-width: 3; }
+    .excluded { fill: #fff6ed; stroke: #d96716; stroke-width: 3; }
+    .box-title { fill: #111827; font: 700 21px Arial, Helvetica, sans-serif; }
+    .box-copy { fill: #52606d; font: 16.5px Arial, Helvetica, sans-serif; }
+    .boundary-label { fill: #3f7000; font: 700 18px Arial, Helvetica, sans-serif; }
+    .infra-label { fill: #005b73; font: 700 19px Arial, Helvetica, sans-serif; }
+    .infra-note { fill: #005b73; font: italic 17px Arial, Helvetica, sans-serif; }
+  </style>
+
+  <rect class="canvas" width="1200" height="800" />
+
+  <text class="section-title" x="180" y="42" text-anchor="middle">Tenant Controls</text>
+  <text class="section-title" x="600" y="42" text-anchor="middle">Runtime and Infrastructure</text>
+  <text class="section-title" x="1020" y="42" text-anchor="middle">Tenant Trust Policy</text>
+
+  <!-- Tenant controls -->
+  <rect class="group" x="20" y="70" width="320" height="660" />
+
+  <rect class="tenant-box" x="45" y="100" width="270" height="130" />
+  <text class="box-title" x="180" y="132" text-anchor="middle">Protected assets</text>
+  <text class="box-copy" x="180" y="157" text-anchor="middle">
+    <tspan x="180" dy="0">Encrypted model weights</tspan>
+    <tspan x="180" dy="22">Data, prompts, and fine-tuning</tspan>
+    <tspan x="180" dy="22">artifacts</tspan>
+    <tspan x="180" dy="22">Runtime secrets</tspan>
+  </text>
+
+  <rect class="tenant-box" x="45" y="250" width="270" height="130" />
+  <text class="box-title" x="180" y="282" text-anchor="middle">Security policy</text>
+  <text class="box-copy" x="180" y="310" text-anchor="middle">
+    <tspan x="180" dy="0">Defines required platform</tspan>
+    <tspan x="180" dy="22">controls, measurements,</tspan>
+    <tspan x="180" dy="22">and key-release rules</tspan>
+  </text>
+
+  <rect class="tenant-box" x="45" y="400" width="270" height="130" />
+  <text class="box-title" x="180" y="432" text-anchor="middle">Attestation</text>
+  <text class="box-copy" x="180" y="460" text-anchor="middle">
+    <tspan x="180" dy="0">Remote verifier appraises</tspan>
+    <tspan x="180" dy="22">fresh evidence against</tspan>
+    <tspan x="180" dy="22">tenant policy</tspan>
+  </text>
+
+  <rect class="tenant-box" x="45" y="550" width="270" height="130" />
+  <text class="box-title" x="180" y="582" text-anchor="middle">Remote key service</text>
+  <text class="box-copy" x="180" y="610" text-anchor="middle">
+    <tspan x="180" dy="0">Tenant policy authorizes</tspan>
+    <tspan x="180" dy="22">key release to the</tspan>
+    <tspan x="180" dy="22">approved workload</tspan>
+  </text>
+
+  <!-- Runtime and infrastructure -->
+  <rect class="tenant-boundary" x="350" y="70" width="500" height="380" />
+  <text class="boundary-label" x="600" y="103" text-anchor="middle">Tenant-operated trust boundary</text>
+
+  <rect class="tenant-box" x="385" y="120" width="430" height="70" />
+  <text class="box-title" x="600" y="148" text-anchor="middle">Encrypted AI workloads</text>
+  <text class="box-copy" x="600" y="173" text-anchor="middle">Run after attestation and key release</text>
+
+  <rect class="tenant-box" x="385" y="200" width="430" height="70" />
+  <text class="box-title" x="600" y="228" text-anchor="middle">Tenant-owned platform software</text>
+  <text class="box-copy" x="600" y="253" text-anchor="middle">Kubernetes, hypervisor, schedulers</text>
+
+  <rect class="tenant-box" x="385" y="280" width="430" height="70" />
+  <text class="box-title" x="600" y="308" text-anchor="middle">Tenant-owned host software</text>
+  <text class="box-copy" x="600" y="333" text-anchor="middle">Host OS, kernel, and drivers</text>
+
+  <rect class="tenant-box" x="385" y="360" width="430" height="70" />
+  <text class="box-title" x="600" y="388" text-anchor="middle">NVIDIA Confidential Computing</text>
+  <text class="box-copy" x="600" y="406" text-anchor="middle">
+    <tspan x="600" dy="0">Platform security controls</tspan>
+    <tspan x="600" dy="20">Tenant-configured security posture</tspan>
+  </text>
+
+  <rect class="infra-group" x="350" y="480" width="500" height="230" />
+  <text class="infra-label" x="600" y="517" text-anchor="middle">Infrastructure owner operations</text>
+  <rect class="infra-box" x="385" y="540" width="430" height="75" />
+  <text class="box-title" x="600" y="585" text-anchor="middle">NVIDIA accelerated infrastructure</text>
+  <text class="box-copy" x="600" y="640" text-anchor="middle">
+    <tspan x="600" dy="0">NVIDIA Grace Blackwell and</tspan>
+    <tspan x="600" dy="22">NVIDIA Vera Rubin platforms</tspan>
+  </text>
+  <text class="infra-note" x="600" y="684" text-anchor="middle">
+    <tspan x="600" dy="0">Infrastructure owner manages physical access,</tspan>
+    <tspan x="600" dy="22">maintenance, and availability</tspan>
+  </text>
+
+  <!-- Tenant trust policy -->
+  <rect class="group" x="860" y="70" width="320" height="370" />
+
+  <rect class="tenant-box" x="885" y="100" width="270" height="135" />
+  <text class="box-title" x="1020" y="135" text-anchor="middle">Evidence and policy</text>
+  <text class="box-copy" x="1020" y="165" text-anchor="middle">
+    <tspan x="1020" dy="0">Accepted evidence informs</tspan>
+    <tspan x="1020" dy="22">tenant policy; signatures</tspan>
+    <tspan x="1020" dy="22">alone do not authorize use</tspan>
+  </text>
+
+  <rect class="tenant-box" x="885" y="250" width="270" height="175" />
+  <text class="box-title" x="1020" y="285" text-anchor="middle">
+    <tspan x="1020" dy="0">Tenant-operated</tspan>
+    <tspan x="1020" dy="25">software stack</tspan>
+  </text>
+  <text class="box-copy" x="1020" y="340" text-anchor="middle">
+    <tspan x="1020" dy="0">The tenant builds and</tspan>
+    <tspan x="1020" dy="22">operates host software,</tspan>
+    <tspan x="1020" dy="22">platform software,</tspan>
+    <tspan x="1020" dy="22">and workloads</tspan>
+  </text>
+
+  <rect class="excluded" x="860" y="480" width="320" height="180" />
+  <text class="box-title" x="1020" y="516" text-anchor="middle">
+    <tspan x="1020" dy="0">Infrastructure owner</tspan>
+    <tspan x="1020" dy="25">excluded</tspan>
+  </text>
+  <text class="box-copy" x="1020" y="574" text-anchor="middle">
+    <tspan x="1020" dy="0">Infrastructure owner has</tspan>
+    <tspan x="1020" dy="22">no authority to read</tspan>
+    <tspan x="1020" dy="22">runtime plaintext</tspan>
+  </text>
+</svg>

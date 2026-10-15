@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1130" viewBox="0 0 1200 1130" role="img" aria-labelledby="title desc">
+  <title id="title">CBM provisioning and runtime flow</title>
+  <desc id="desc">The infrastructure owner and tenant prepare the platform and trust policy independently before handoff. At runtime, the tenant launches the measured stack, the verifier appraises evidence, the relying party authorizes key release, the tenant runs the workload, and the tenant and infrastructure owner end or change the tenancy.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#006b85" />
+    </marker>
+  </defs>
+
+  <style>
+    .canvas { fill: #ffffff; }
+    .phase-title { fill: #006b85; font: 700 27px Arial, Helvetica, sans-serif; }
+    .runtime-title { fill: #17633f; font: 700 27px Arial, Helvetica, sans-serif; }
+    .phase-copy { fill: #425466; font: 18px Arial, Helvetica, sans-serif; }
+    .provision-card { fill: #eef6f9; stroke: #b9ced9; stroke-width: 2; }
+    .handoff-card { fill: #eef6f9; stroke: #8fb4c4; stroke-width: 2; }
+    .role-title { fill: #152638; font: 700 21px Arial, Helvetica, sans-serif; }
+    .role-copy { fill: #52606d; font: 17px Arial, Helvetica, sans-serif; }
+    .action-title { fill: #006b85; font: 700 23px Arial, Helvetica, sans-serif; }
+    .action-copy { fill: #152638; font: 18px Arial, Helvetica, sans-serif; }
+    .merge-line { fill: none; stroke: #006b85; stroke-width: 2; }
+    .arrow-line { stroke: #006b85; stroke-width: 2; marker-end: url(#arrow); }
+    .column-label { fill: #425466; font: 700 18px Arial, Helvetica, sans-serif; letter-spacing: 0.4px; }
+    .row { fill: #ffffff; stroke: #bfd0d9; stroke-width: 2; }
+    .row-role { fill: #eef3f6; }
+    .row-highlight { fill: #f3f9f0; stroke: #76b900; stroke-width: 2; }
+    .row-role-highlight { fill: #e6f4de; }
+    .step-role { fill: #152638; font: 700 18px Arial, Helvetica, sans-serif; }
+    .step-role-copy { fill: #425466; font: 17px Arial, Helvetica, sans-serif; }
+    .step-number { fill: #ffffff; font: 700 20px Arial, Helvetica, sans-serif; }
+    .step-circle { fill: #006b85; }
+    .step-circle-highlight { fill: #3f7f1f; }
+    .step-title { fill: #152638; font: 700 20px Arial, Helvetica, sans-serif; }
+    .step-title-highlight { fill: #17633f; font: 700 20px Arial, Helvetica, sans-serif; }
+    .step-copy { fill: #425466; font: 17px Arial, Helvetica, sans-serif; }
+    .note { fill: #425466; font: 18px Arial, Helvetica, sans-serif; }
+  </style>
+
+  <rect class="canvas" width="1200" height="1130" />
+
+  <!-- Provisioning -->
+  <text class="phase-title" x="30" y="42">Provisioning: Before Workload Launch</text>
+  <text class="phase-copy" x="30" y="72">Independent preparation. NVIDIA and hardware suppliers provide firmware, trust anchors, and reference values.</text>
+
+  <rect class="provision-card" x="30" y="95" width="555" height="190" />
+  <text class="role-title" x="55" y="128">Infrastructure owner</text>
+  <text class="role-copy" x="55" y="154">Examples: cloud or neo-cloud provider</text>
+  <text class="action-title" x="55" y="192">Prepare the Platform</text>
+  <text class="action-copy" x="55" y="222">
+    <tspan x="55" dy="0">Install firmware and set required hardware and</tspan>
+    <tspan x="55" dy="25">firmware controls. Allocate dedicated hosts and fabric.</tspan>
+  </text>
+
+  <rect class="provision-card" x="615" y="95" width="555" height="190" />
+  <text class="role-title" x="640" y="128">Tenant</text>
+  <text class="role-copy" x="640" y="154">AI lab or model provider</text>
+  <text class="action-title" x="640" y="192">Prepare Images and Trust Policy</text>
+  <text class="action-copy" x="640" y="222">
+    <tspan x="640" dy="0">Build signed OS, driver, and workload images.</tspan>
+    <tspan x="640" dy="25">Select reference values and key-release policy.</tspan>
+  </text>
+
+  <rect class="handoff-card" x="30" y="320" width="1140" height="110" />
+  <path class="merge-line" d="M 308 285 V 300 H 600" />
+  <path class="merge-line" d="M 893 285 V 300 H 600" />
+  <line class="arrow-line" x1="600" y1="300" x2="600" y2="315" />
+
+  <text class="role-title" x="55" y="357">Tenant</text>
+  <text class="action-title" x="250" y="357">Handoff and Installation</text>
+  <text class="action-copy" x="55" y="397">Take control of the host, install the image, and set workload security controls for launch.</text>
+
+  <!-- Runtime workflow -->
+  <text class="runtime-title" x="30" y="482">Runtime and Online Checks</text>
+  <text class="column-label" x="55" y="518">RESPONSIBLE PARTY</text>
+  <text class="column-label" x="400" y="518">SEQUENTIAL ACTION</text>
+
+  <!-- Step 1 -->
+  <rect class="row" x="30" y="535" width="1140" height="95" />
+  <rect class="row-role" x="31" y="536" width="290" height="93" />
+  <text class="step-role" x="55" y="571">Tenant</text>
+  <text class="step-role-copy" x="55" y="597">With platform firmware</text>
+  <circle class="step-circle" cx="360" cy="582" r="23" />
+  <text class="step-number" x="360" y="589" text-anchor="middle">1</text>
+  <text class="step-title" x="400" y="568">Launch Measured Stack and Collect Evidence</text>
+  <text class="step-copy" x="400" y="598">Establish live controls and collect CPU and GPU reports and logs.</text>
+
+  <!-- Step 2 -->
+  <rect class="row" x="30" y="640" width="1140" height="95" />
+  <rect class="row-role" x="31" y="641" width="290" height="93" />
+  <text class="step-role" x="55" y="695">Verifier</text>
+  <circle class="step-circle" cx="360" cy="687" r="23" />
+  <text class="step-number" x="360" y="694" text-anchor="middle">2</text>
+  <text class="step-title" x="400" y="673">Appraise Evidence Against Tenant Policy</text>
+  <text class="step-copy" x="400" y="703">Check freshness, reference values, bindings, and required states.</text>
+
+  <!-- Step 3 -->
+  <rect class="row" x="30" y="745" width="1140" height="95" />
+  <rect class="row-role" x="31" y="746" width="290" height="93" />
+  <text class="step-role" x="55" y="780">Relying party and</text>
+  <text class="step-role" x="55" y="806">key authority</text>
+  <circle class="step-circle" cx="360" cy="792" r="23" />
+  <text class="step-number" x="360" y="799" text-anchor="middle">3</text>
+  <text class="step-title" x="400" y="778">Authorize Use and Release Keys</text>
+  <text class="step-copy" x="400" y="808">Release keys only after policy passes. Bind the release path to the runtime.</text>
+
+  <!-- Step 4 -->
+  <rect class="row-highlight" x="30" y="850" width="1140" height="95" />
+  <rect class="row-role-highlight" x="31" y="851" width="290" height="93" />
+  <text class="step-role" x="55" y="905">Tenant</text>
+  <circle class="step-circle-highlight" cx="360" cy="897" r="23" />
+  <text class="step-number" x="360" y="904" text-anchor="middle">4</text>
+  <text class="step-title-highlight" x="400" y="883">Run Workload and Serve End Users</text>
+  <text class="step-copy" x="400" y="913">Protect model assets, buffers, peer access, and data paths.</text>
+
+  <!-- Step 5 -->
+  <rect class="row" x="30" y="955" width="1140" height="95" />
+  <rect class="row-role" x="31" y="956" width="290" height="93" />
+  <text class="step-role" x="55" y="990">Tenant and</text>
+  <text class="step-role" x="55" y="1016">infrastructure owner</text>
+  <circle class="step-circle" cx="360" cy="1002" r="23" />
+  <text class="step-number" x="360" y="1009" text-anchor="middle">5</text>
+  <text class="step-title" x="400" y="988">End or Change the Tenancy</text>
+  <text class="step-copy" x="400" y="1018">Retire keys and peer state. Reset the platform for a new tenancy.</text>
+
+  <text class="note" x="30" y="1090">A failed check blocks key release. After a reset or relevant change, repeat launch and appraisal.</text>
+</svg>
