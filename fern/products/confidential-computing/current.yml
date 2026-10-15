@@ -34,3 +34,6 @@ navigation:
         href: https://docs.nvidia.com/attestation/#overview
       - link: Attestation SDK
         href: https://github.com/nvidia/attestation-sdk
+      - page: Licensing
+        path: ../../pages/shared/licensing.mdx
+        slug: licensing

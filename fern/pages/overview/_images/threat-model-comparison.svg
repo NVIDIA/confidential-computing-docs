@@ -2,7 +2,7 @@
   <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved. -->
   <!-- SPDX-License-Identifier: Apache-2.0 -->
   <title id="title">Who controls each layer</title>
-  <desc id="description">Three aligned stacks show the trusted, tenant-controlled component at successively higher layers: the host OS for Confidential Bare Metal, the guest OS for a confidential VM, and the container in a confidential pod VM for Confidential Containers. Other tenants sit beside the guest and container. The adversary column aligns infrastructure administrators with the platform row, host administrators with the host OS and hypervisor row, and Kubernetes administrators with the control plane row. Green means tenant-controlled and trusted, gray means untrusted, and red identifies primary adversaries and access paths.</desc>
+  <desc id="description">Three aligned stacks show the trusted, tenant-controlled component at successively higher layers: the host OS for Confidential Bare Metal, the guest OS for a confidential VM, and the container in a confidential pod VM for Confidential Containers. Other tenants sit beside the guest and container. The adversary column places Kubernetes administrators in the top row, host administrators in the second row, and infrastructure administrators in one box that spans the bottom two rows. Green means tenant-controlled and trusted, gray means untrusted, and red identifies primary adversaries and access paths.</desc>
   <rect width="1248" height="600" rx="12" fill="#ffffff" />
   <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#171717">
     <g font-size="24" font-weight="700">
@@ -12,20 +12,20 @@
       <text x="1084.5" y="52">Confidential Containers</text>
     </g>
 
-    <!-- Adversaries align with their access paths; the deployment stacks retain slide 4's staircase. -->
+    <!-- Adversaries align with their access paths; infrastructure administrators span the bottom two rows. -->
     <g fill="#f8d5d0">
+      <rect x="20" y="100" width="287" height="94" rx="9" />
       <rect x="20" y="208" width="287" height="94" rx="9" />
-      <rect x="20" y="316" width="287" height="94" rx="9" />
-      <rect x="20" y="424" width="287" height="94" rx="9" />
+      <rect x="20" y="316" width="287" height="202" rx="9" />
     </g>
     <g fill="#922d22">
-      <text x="163.5" y="249" font-size="23" font-weight="700">Kubernetes admin</text>
-      <text x="163.5" y="276" font-size="20">Control plane</text>
-      <text x="163.5" y="357" font-size="23" font-weight="700">Host admin</text>
-      <text x="163.5" y="384" font-size="20">Host OS, hypervisor</text>
-      <text x="163.5" y="455" font-size="23" font-weight="700">Infrastructure admin</text>
-      <text x="163.5" y="480" font-size="19">Out-of-band host access,</text>
-      <text x="163.5" y="505" font-size="19">BMC</text>
+      <text x="163.5" y="141" font-size="23" font-weight="700">Kubernetes admin</text>
+      <text x="163.5" y="168" font-size="20">Control plane</text>
+      <text x="163.5" y="249" font-size="23" font-weight="700">Host admin</text>
+      <text x="163.5" y="276" font-size="20">Host OS, hypervisor</text>
+      <text x="163.5" y="401" font-size="23" font-weight="700">Infrastructure admin</text>
+      <text x="163.5" y="426" font-size="19">Out-of-band host access,</text>
+      <text x="163.5" y="451" font-size="19">BMC</text>
     </g>
 
     <!-- Bare Metal. -->
