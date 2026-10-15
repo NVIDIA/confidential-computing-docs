@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1248" height="670" viewBox="0 0 1248 670" role="img" aria-labelledby="title description">
+  <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved. -->
+  <!-- SPDX-License-Identifier: Apache-2.0 -->
+  <title id="title">Trust boundaries at a glance</title>
+  <desc id="description">Three gray columns distinguish Confidential Bare Metal, Confidential Virtual Machines, and Confidential Containers. Five rounded horizontal outlines span the modalities and compare what the tenant receives, the primary adversary, who runs the host OS, the primary hardware protection, and the main residual exposure.</desc>
+
+  <style>
+    .canvas { fill: #ffffff; }
+    .modality { fill: #f1f3f5; }
+    .boundary { fill: none; stroke: #9aa7b4; stroke-width: 2; }
+    .badge-primary { fill: #76b900; }
+    .badge-secondary { fill: #64717b; }
+    .badge-primary-text { fill: #102000; font: 700 13px Arial, Helvetica, sans-serif; }
+    .badge-secondary-text { fill: #ffffff; font: 700 13px Arial, Helvetica, sans-serif; }
+    .header-title { fill: #171717; font: 700 20px Arial, Helvetica, sans-serif; }
+    .label { fill: #3f4c59; font: 700 17px Arial, Helvetica, sans-serif; }
+    .value { fill: #171717; font: 18px Arial, Helvetica, sans-serif; }
+  </style>
+
+  <rect class="canvas" width="1248" height="670" />
+
+  <!-- Modality backgrounds -->
+  <rect class="modality" x="260" y="20" width="310" height="630" rx="12" />
+  <rect class="modality" x="589" y="20" width="310" height="630" rx="12" />
+  <rect class="modality" x="918" y="20" width="310" height="630" rx="12" />
+
+  <!-- Column headers -->
+  <text class="header-title" x="40" y="82">Boundary</text>
+
+  <circle class="badge-primary" cx="292" cy="75" r="27" />
+  <text class="badge-primary-text" x="292" y="80" text-anchor="middle">CBM</text>
+  <text class="header-title" x="334" y="67">
+    <tspan x="334" dy="0">Confidential Bare</tspan>
+    <tspan x="334" dy="24">Metal</tspan>
+  </text>
+
+  <circle class="badge-secondary" cx="621" cy="75" r="27" />
+  <text class="badge-secondary-text" x="621" y="80" text-anchor="middle">CVM</text>
+  <text class="header-title" x="663" y="82">Confidential VM</text>
+
+  <circle class="badge-secondary" cx="950" cy="75" r="27" />
+  <text class="badge-secondary-text" x="950" y="80" text-anchor="middle">CoCo</text>
+  <text class="header-title" x="992" y="67">
+    <tspan x="992" dy="0">Confidential</tspan>
+    <tspan x="992" dy="24">Containers</tspan>
+  </text>
+
+  <!-- Horizontal boundaries -->
+  <rect class="boundary" x="20" y="130" width="1208" height="90" rx="12" />
+  <rect class="boundary" x="20" y="230" width="1208" height="105" rx="12" />
+  <rect class="boundary" x="20" y="345" width="1208" height="90" rx="12" />
+  <rect class="boundary" x="20" y="445" width="1208" height="95" rx="12" />
+  <rect class="boundary" x="20" y="550" width="1208" height="100" rx="12" />
+
+  <!-- Shared boundary labels -->
+  <text class="label" x="40" y="181">Tenant Receives</text>
+  <text class="label" x="40" y="288">Primary Adversary</text>
+  <text class="label" x="40" y="398">Who Runs the Host OS</text>
+  <text class="label" x="40" y="482">
+    <tspan x="40" dy="0">Primary Hardware</tspan>
+    <tspan x="40" dy="22">Protection</tspan>
+  </text>
+  <text class="label" x="40" y="589">
+    <tspan x="40" dy="0">Main Residual</tspan>
+    <tspan x="40" dy="22">Exposure</tspan>
+  </text>
+
+  <!-- Tenant receives -->
+  <text class="value" x="280" y="181">Whole host</text>
+  <text class="value" x="609" y="181">A VM on a shared host</text>
+  <text class="value" x="938" y="169">
+    <tspan x="938" dy="0">Kubernetes pods</tspan>
+    <tspan x="938" dy="24">(as Kata VMs)</tspan>
+  </text>
+
+  <!-- Primary adversary -->
+  <text class="value" x="280" y="288">Infrastructure owner</text>
+  <text class="value" x="609" y="276">
+    <tspan x="609" dy="0">Privileged host software and</tspan>
+    <tspan x="609" dy="24">co-resident tenants</tspan>
+  </text>
+  <text class="value" x="938" y="288">Kubernetes control plane</text>
+
+  <!-- Host OS operator -->
+  <text class="value" x="280" y="398">Tenant</text>
+  <text class="value" x="609" y="398">Infrastructure owner</text>
+  <text class="value" x="938" y="398">Infrastructure owner</text>
+
+  <!-- Primary hardware protection -->
+  <text class="value" x="280" y="482">
+    <tspan x="280" dy="0">CPU TEE per host</tspan>
+    <tspan x="280" dy="24">GPU in confidential mode</tspan>
+  </text>
+  <text class="value" x="609" y="482">
+    <tspan x="609" dy="0">CPU TEE per VM</tspan>
+    <tspan x="609" dy="24">GPU in confidential mode</tspan>
+  </text>
+  <text class="value" x="938" y="482">
+    <tspan x="938" dy="0">CPU TEE per pod</tspan>
+    <tspan x="938" dy="24">GPU in confidential mode</tspan>
+  </text>
+
+  <!-- Main residual exposure -->
+  <text class="value" x="280" y="589">
+    <tspan x="280" dy="0">CPU–GPU link on Grace platforms</tspan>
+    <tspan x="280" dy="24">Physical security</tspan>
+  </text>
+  <text class="value" x="609" y="601">Physical security</text>
+  <text class="value" x="938" y="577">
+    <tspan x="938" dy="0">Control-plane-supplied config,</tspan>
+    <tspan x="938" dy="24">volumes</tspan>
+    <tspan x="938" dy="24">Physical security</tspan>
+  </text>
+</svg>

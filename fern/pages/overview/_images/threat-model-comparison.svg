@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1248" height="600" viewBox="0 0 1248 600" role="img" aria-labelledby="title description">
+  <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved. -->
+  <!-- SPDX-License-Identifier: Apache-2.0 -->
+  <title id="title">Who controls each layer</title>
+  <desc id="description">Three aligned stacks show the trusted, tenant-controlled component at successively higher layers: the host OS for Confidential Bare Metal, the guest OS for a confidential VM, and the container in a confidential pod VM for Confidential Containers. Other tenants sit beside the guest and container. The adversary column aligns infrastructure administrators with the platform row, host administrators with the host OS and hypervisor row, and Kubernetes administrators with the control plane row. Green means tenant-controlled and trusted, gray means untrusted, and red identifies primary adversaries and access paths.</desc>
+  <rect width="1248" height="600" rx="12" fill="#ffffff" />
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#171717">
+    <g font-size="24" font-weight="700">
+      <text x="163.5" y="52">Adversary</text>
+      <text x="470.5" y="52">Bare Metal</text>
+      <text x="777.5" y="52">Confidential VM</text>
+      <text x="1084.5" y="52">Confidential Containers</text>
+    </g>
+
+    <!-- Adversaries align with their access paths; the deployment stacks retain slide 4's staircase. -->
+    <g fill="#f8d5d0">
+      <rect x="20" y="208" width="287" height="94" rx="9" />
+      <rect x="20" y="316" width="287" height="94" rx="9" />
+      <rect x="20" y="424" width="287" height="94" rx="9" />
+    </g>
+    <g fill="#922d22">
+      <text x="163.5" y="249" font-size="23" font-weight="700">Kubernetes admin</text>
+      <text x="163.5" y="276" font-size="20">Control plane</text>
+      <text x="163.5" y="357" font-size="23" font-weight="700">Host admin</text>
+      <text x="163.5" y="384" font-size="20">Host OS, hypervisor</text>
+      <text x="163.5" y="455" font-size="23" font-weight="700">Infrastructure admin</text>
+      <text x="163.5" y="480" font-size="19">Out-of-band host access,</text>
+      <text x="163.5" y="505" font-size="19">BMC</text>
+    </g>
+
+    <!-- Bare Metal. -->
+    <rect x="327" y="316" width="287" height="94" rx="9" fill="#76b900" />
+    <text x="470.5" y="372" font-size="25" font-weight="700" fill="#102000">Host OS</text>
+    <rect x="327" y="424" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="470.5" y="464" font-size="25" font-weight="700">Platform</text>
+    <text x="470.5" y="493" font-size="20" fill="#374151">HW, firmware, BMC</text>
+
+    <!-- Confidential VM. Other tenants are peers, not a lower infrastructure layer. -->
+    <rect x="634" y="208" width="165" height="94" rx="9" fill="#76b900" />
+    <text x="716.5" y="264" font-size="25" font-weight="700" fill="#102000">Guest OS</text>
+    <rect x="807" y="208" width="114" height="94" rx="9" fill="#e5e7eb" />
+    <text x="864" y="248" font-size="20" fill="#374151">Other</text>
+    <text x="864" y="275" font-size="20" fill="#374151">tenants</text>
+    <rect x="634" y="316" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="777.5" y="356" font-size="25" font-weight="700">Host OS</text>
+    <text x="777.5" y="385" font-size="20" fill="#374151">Hypervisor</text>
+    <rect x="634" y="424" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="777.5" y="464" font-size="25" font-weight="700">Platform</text>
+    <text x="777.5" y="493" font-size="20" fill="#374151">HW, firmware, BMC</text>
+
+    <!-- Confidential Containers. -->
+    <rect x="941" y="100" width="165" height="94" rx="9" fill="#76b900" />
+    <text x="1023.5" y="133" font-size="25" font-weight="700" fill="#102000">Container</text>
+    <text x="1023.5" y="159" font-size="19" fill="#102000">Confidential</text>
+    <text x="1023.5" y="182" font-size="19" fill="#102000">pod VM</text>
+    <rect x="1114" y="100" width="114" height="94" rx="9" fill="#e5e7eb" />
+    <text x="1171" y="140" font-size="20" fill="#374151">Other</text>
+    <text x="1171" y="167" font-size="20" fill="#374151">tenants</text>
+    <rect x="941" y="208" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="1084.5" y="248" font-size="25" font-weight="700">Kubernetes</text>
+    <text x="1084.5" y="277" font-size="20" fill="#374151">Control plane</text>
+    <rect x="941" y="316" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="1084.5" y="356" font-size="25" font-weight="700">Host OS</text>
+    <text x="1084.5" y="385" font-size="20" fill="#374151">Hypervisor</text>
+    <rect x="941" y="424" width="287" height="94" rx="9" fill="#e5e7eb" />
+    <text x="1084.5" y="464" font-size="25" font-weight="700">Platform</text>
+    <text x="1084.5" y="493" font-size="20" fill="#374151">HW, firmware, BMC</text>
+
+    <g text-anchor="start" font-size="19" fill="#374151">
+      <rect x="20" y="558" width="18" height="18" rx="3" fill="#76b900" />
+      <text x="48" y="573">Tenant-controlled (trusted)</text>
+      <rect x="465" y="558" width="18" height="18" rx="3" fill="#e5e7eb" />
+      <text x="493" y="573">Untrusted</text>
+      <rect x="715" y="558" width="18" height="18" rx="3" fill="#f8d5d0" />
+      <text x="743" y="573">Primary Adversary (access path)</text>
+    </g>
+  </g>
+</svg>

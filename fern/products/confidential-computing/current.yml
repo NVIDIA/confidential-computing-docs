@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/product-yml.schema.json
-# Landing product: Dev navigation for the overview, concepts, and shared
-# guides (former "Platform Guides"). Product-specific material lives in the
-# bare-metal, virtual-machines, and containers products, each with its own version list.
+# Landing product: Dev navigation for the overview, deployment-model links,
+# and shared guides (former "Platform Guides"). Product-specific material
+# lives in the bare-metal, virtual-machines, and containers products, each
+# with its own version list.
 
 navigation:
   - section: Confidential Computing
@@ -10,9 +11,6 @@ navigation:
       - page: Overview
         path: ../../pages/overview/index.mdx
         slug: ""
-      - page: Positioning
-        path: ../../pages/overview/positioning.mdx
-        slug: positioning
 
   - section: Deployment Models
     slug: ""
