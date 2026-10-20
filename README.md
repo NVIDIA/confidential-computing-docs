@@ -4,21 +4,23 @@ Source for the NVIDIA Confidential Computing documentation site.
 
 The documentation treats each deployment modality as a product with an independent version:
 
-| Product | Slug | Pages |
-| --- | --- | --- |
-| Confidential Computing (landing) | `/` | Overview, Deployment Modalities, Guides: Attestation, Platform Compatibility Matrix |
-| Confidential Bare Metal | `/bare-metal` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
-| Confidential Virtual Machines | `/virtual-machines` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
-| Confidential Containers | `/containers` | Overview, Deployment Guide, Reference Architecture, Playbooks, Performance |
+| Product | Slug |
+| --- | --- |
+| Confidential Computing (landing) | `/` |
+| Confidential Bare Metal | `/bare-metal` |
+| Confidential Virtual Machines | `/virtual-machines` |
+| Confidential Containers | `/containers` |
 
-To contribute, refer to [CONTRIBUTING.md](CONTRIBUTING.md). To report a
-security issue, refer to [SECURITY.md](SECURITY.md).
+To contribute, refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+To report a security issue, refer to [SECURITY.md](SECURITY.md).
 
 ## Layout
 
 - `fern/fern.config.json`: the Fern organization (`nvidia`) and CLI version.
 - `fern/docs.yml`: the site settings, the product list, and the version list for each product.
-- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the landing product. `main` serves `current.yml` as the Dev version, and a tagged version serves the `current.yml` from the tag.
+- `fern/products/<product>/current.yml`: the navigation for the current content of each product.
+  `confidential-computing` is the landing product.
+  `main` serves `current.yml` as the Dev version, and a tagged version serves the `current.yml` from the tag.
 - `fern/pages/`: the MDX pages.
 
 ## Local Check
