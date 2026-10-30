@@ -18,7 +18,7 @@ security issue, refer to [SECURITY.md](SECURITY.md).
 
 - `fern/fern.config.json`: the Fern organization (`nvidia`) and CLI version.
 - `fern/docs.yml`: the site settings, the product list, and the version list for each product.
-- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the landing product. `main` serves `current.yml` as the Dev version, and a tagged version serves the `current.yml` from the tag.
+- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the unversioned landing product. For versioned deployment products, `main` serves `current.yml` as Dev, and a tagged version serves the `current.yml` from the tag.
 - `fern/pages/`: the MDX pages.
 
 ## Local Check
