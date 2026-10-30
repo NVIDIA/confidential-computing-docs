@@ -1,8 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/product-yml.schema.json
-# Landing product: Dev navigation for the overview, deployment-modality links,
-# and shared resources. Product-specific material
-# lives in the bare-metal, virtual-machines, and containers products, each
-# with its own version list.
+# Landing product navigation for the overview, deployment-modality links, and
+# shared resources. Product-specific material lives in the bare-metal,
+# virtual-machines, and containers products, each with its own version list.
 
 navigation:
   - section: Confidential Computing

@@ -42,24 +42,22 @@ check:
 
 # Each deployment pattern is a Fern product with its own version list so CBM,
 # CVM, and CoCo can release on independent cadences. The landing product holds
-# the overview plus the shared guides and has its own cadence. Version lists
-# are maintained by hand; see README "Releases".
+# the unversioned overview and shared guides. Product version lists are
+# maintained by hand; see README "Releases".
 products:
   - display-name: Confidential Computing
     subtitle: Overview and shared guides
     path: ./products/confidential-computing/current.yml
     slug: ""
-    versions:
-      - display-name: Dev
-        path: ./products/confidential-computing/current.yml
-        slug: dev
-        availability: beta
 
   - display-name: Confidential Bare Metal
     subtitle: Dedicated-node deployments
     path: ./products/bare-metal/current.yml
     slug: bare-metal
     versions:
+      - display-name: v1.0.0
+        ref: bare-metal-v1.0.0
+        slug: v1.0.0
       - display-name: Dev
         path: ./products/bare-metal/current.yml
         slug: dev
@@ -70,6 +68,9 @@ products:
     path: ./products/virtual-machines/current.yml
     slug: virtual-machines
     versions:
+      - display-name: v1.0.0
+        ref: virtual-machines-v1.0.0
+        slug: v1.0.0
       - display-name: Dev
         path: ./products/virtual-machines/current.yml
         slug: dev
