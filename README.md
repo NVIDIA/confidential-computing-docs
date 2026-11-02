@@ -18,7 +18,8 @@ security issue, refer to [SECURITY.md](SECURITY.md).
 
 - `fern/fern.config.json`: the Fern organization (`nvidia`) and CLI version.
 - `fern/docs.yml`: the site settings, the product list, and the version list for each product.
-- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the unversioned landing product. For versioned deployment products, `main` serves `current.yml` as Dev, and a tagged version serves the `current.yml` from the tag.
+- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the unversioned landing product. Versioned deployment products serve `current.yml` as Dev. Released versions use either a version-specific navigation file or a Git ref.
+- `fern/products/bare-metal/v1.0.0.yml` and `fern/pages/bare-metal/v1.0.0/`: the navigation and content for the bare-metal v1.0.0 release.
 - `fern/pages/`: the MDX pages.
 
 ## Local Check
@@ -33,14 +34,15 @@ fern-api/fern#17950 is in a Fern release.
 
 ## Releases
 
-Versions are hand-managed in `fern/docs.yml`. To release one product, tag
-`main`, for example `bare-metal-v1.0.0`, and add a version entry that points
-at the tag to that product only:
+Versions are hand-managed in `fern/docs.yml`. Bare-metal v1.0.0 uses a
+version-specific navigation file and a copy of the release pages in the working
+tree. To update that release, edit its pages and merge the change to `main`.
+The corresponding bare-metal version entries look like this:
 
 ```yaml
     versions:
       - display-name: v1.0.0
-        ref: bare-metal-v1.0.0
+        path: ./products/bare-metal/v1.0.0.yml
         slug: v1.0.0
         availability: stable
       - display-name: Dev
@@ -49,7 +51,7 @@ at the tag to that product only:
         availability: beta
 ```
 
-Fern builds the tagged checkout for that version, so the release shows the
-`current.yml` and pages from the tag. The other products are unaffected.
-Merging the version entry to `main` publishes the site. Pushing a tag alone
-does not publish.
+Fern builds the versioned bare-metal pages from the working tree. Other products
+currently use Git refs for their releases; for a ref-backed version, Fern builds
+the matching product's navigation and pages from that ref. Merging changes
+under `fern/` to `main` publishes the site; pushing a tag alone does not publish.

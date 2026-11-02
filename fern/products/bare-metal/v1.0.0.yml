@@ -1,0 +1,15 @@
+# Confidential Bare Metal v1.0.0 navigation.
+
+navigation:
+  - section: Confidential Bare Metal
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/bare-metal/v1.0.0/index.mdx
+        slug: ""
+      - page: Trust and Threat Model
+        path: ../../pages/bare-metal/v1.0.0/threat-model.mdx
+        slug: threat-model
+      - page: Licensing
+        path: ../../pages/bare-metal/v1.0.0/licensing.mdx
+        slug: licensing
