@@ -56,7 +56,7 @@ products:
     slug: bare-metal
     versions:
       - display-name: v1.0.0
-        ref: release-v1.0.0
+        path: ./products/bare-metal/v1.0.0.yml
         slug: v1.0.0
       - display-name: Dev
         path: ./products/bare-metal/current.yml

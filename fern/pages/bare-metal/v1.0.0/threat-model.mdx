@@ -1,0 +1,132 @@
+---
+title: "Trust and Threat Model"
+description: "Understand the trusted components, responsibilities, mitigated threats, and limits of Confidential Bare Metal deployments."
+sidebar-title: "Trust and Threat Model"
+---
+
+Confidential Bare Metal (CBM) protects a model owner's model weights, data, and keys on dedicated hosts, within the supported platform's threat model.
+These model weights, data, and keys are the protected assets.
+The model owner controls the host OS, drivers, workload, attestation policy, and key-release policy.
+The infrastructure owner supplies the platform and remains outside the runtime trust boundary after handoff and verification.
+
+CBM trusts the model owner's privileged software and administrators.
+CBM does not isolate tenant end-user data from the model owner or the model owner's approved software.
+
+## Scope and Platform Assumptions
+
+This model assumes that one model owner controls each dedicated host and the software that handles protected assets.
+CBM does not require a confidential virtual machine (CVM).
+Instead, CBM combines measured launch, attestation, memory protections, GPU access controls, and protection of supported communication paths.
+
+The protections depend on the deployed hardware, firmware, topology, software, and enabled security settings.
+You must verify those conditions before releasing secrets.
+The [Platform and Interconnect Limits](#platform-and-interconnect-limits) describe the Grace Blackwell baseline and the limits of individual protections.
+
+## Trust and Responsibilities
+
+These are functional roles; one organization can fill several roles.
+In CBM, the model owner receives the dedicated host.
+
+| Party | Controls or provides | Responsibility or trust dependency |
+| --- | --- | --- |
+| Model owner | Host OS, drivers, workload, protected assets, attestation policy, and key-release policy | Approves and secures the model owner's software, administrative access, peer access, and data handling. Privileged access to plaintext remains trusted. |
+| Infrastructure owner | Hardware and firmware setup, power, baseboard management controller (BMC), fabric, and storage | Supplies dedicated hosts. Remains responsible for availability and agreed physical safeguards. Provisioning requires verification; management access does not authorize access to runtime plaintext. |
+| NVIDIA | NVIDIA hardware, firmware, and reference values | Supplies security components and evidence approved by the model owner's attestation policy. Does not approve the model owner's software. |
+| OEM and other suppliers | Platform integration, other components, and reference values | Supply components approved by the model owner's attestation policy. An OEM signature alone does not establish that a component is acceptable. |
+| Verifier and key-release services | Evidence appraisal and key release under the model owner's policies | Apply the model owner's attestation and key-release policies and deliver secrets securely to the approved workload. These services remain trusted. |
+| Tenant end user | Inputs, outputs, and requirements for access and retention | Relies on the model owner and workload software to protect supplied data. CBM does not provide an independent boundary against those parties. |
+
+## Runtime Trust Boundary
+
+The trusted computing base (TCB) comprises the components whose correct behavior is required to protect the workload:
+
+- **Model owner's software and administrators:** The host OS, privileged drivers, workload, and other software or administrators with access to protected assets.
+- **CPU and platform security components:** The hardware and firmware that enforce the approved launch and memory protections.
+- **GPU security components:** GPU hardware and firmware that enforce the approved GPU access controls and communication protections.
+- **Verifiers and key-release services:** Verifiers, reference values, attestation and key-release policies, and services that release secrets, including services outside the host.
+
+The infrastructure owner remains outside this runtime trust boundary after handoff and verification.
+The infrastructure owner's management interfaces, including the BMC, must not have access to workload plaintext.
+The deployment still relies on the infrastructure owner for availability and physical safeguards outside the hardware protections.
+
+Dynamic Root of Trust for Measurement (DRTM) establishes a measured launch into the model owner's approved software.
+Prior boot software is excluded only when launch inputs and interfaces that remain accessible after launch are controlled.
+DRTM does not remove the running OS, drivers, or workload software from the TCB.
+
+A network interface controller (NIC) does not become trusted merely because the NIC supports attestation.
+The deployment must explicitly establish whether a NIC belongs in the workload's TCB.
+NICs outside the TCB must have restricted memory access, and sensitive data must be encrypted before those NICs can access the data.
+
+## Threats and Mitigations
+
+The following protections assume that the model owner's attestation and key-release policies approve the actual platform, software, security settings, and communication endpoints.
+
+| Threat or access path | Protection | Remaining condition or limit |
+| --- | --- | --- |
+| The infrastructure owner supplies unapproved boot software or launch inputs | DRTM establishes a measured launch. Authenticated launch logs and attestation evidence support appraisal of the launched software. | Launch inputs and remaining interfaces must be controlled. The model owner's software remains trusted after launch. |
+| A platform presents an unapproved component or security configuration | The verifier compares fresh identity, measurement, and reported security-setting evidence against approved reference values and the attestation policy. | A valid signature alone does not authorize key release. The attestation policy must cover the components and settings required by the workload. |
+| An attacker observes CPU DRAM contents | CPU memory encryption protects the confidentiality of CPU DRAM contents where enabled. | CPU memory encryption alone does not establish integrity or replay protection and does not restrict the model owner's software. |
+| An attacker attempts to access GPU memory | GPU access controls protect GPU memory. | Coverage depends on the platform and verified settings. The model owner's privileged software remains trusted. |
+| An attacker observes or tampers with GPU-to-GPU traffic across NVLink Switches | NVLink encryption protects traffic between approved GPU endpoints and detects tampering without exposing plaintext to NVLink Switches. | NVLink encryption must be enabled. The protection covers NVLink traffic, not unrelated host, network, or storage paths. |
+| A NIC outside the TCB accesses sensitive data | Restricted memory mappings limit device access. Encryption protects sensitive payloads before the NIC can access those payloads. | The model owner's software must enforce the mappings and protect sensitive network and remote direct memory access (RDMA) traffic. |
+
+## Platform and Interconnect Limits
+
+Protection of one memory region or communication path does not establish protection of the whole host.
+Assess every path that carries sensitive data and the endpoints that can access plaintext.
+
+The Grace Blackwell baseline has the following limits:
+
+| Path or component | Protection or limit |
+| --- | --- |
+| CPU-to-GPU chip-to-chip (C2C) link and CPU-to-CPU CLink, where present | C2C and CLink encryption are unavailable. The links retain their physical-exposure limits. |
+| PCIe | Hardware PCIe Integrity and Data Encryption (IDE) is unavailable. Software or protocol encryption protects selected traffic; CBM does not establish encryption of every PCIe transaction. |
+| GPU remote procedure calls (RPCs) | Authenticated encryption uses keys derived through Security Protocol and Data Model (SPDM). This protection applies to the covered protocol traffic. |
+| NICs and RDMA | Baseline NICs remain outside the workload TCB. The model owner's software must encrypt sensitive RDMA payloads and restrict memory mappings visible to the NIC. |
+| NVLink | NVLink encryption protects GPU-to-GPU traffic across NVLink Switches when enabled. NVLink encryption does not protect C2C, PCIe, or RDMA traffic. |
+
+Do not infer encrypted host/device links or trusted NICs from the CBM deployment modality alone.
+A deployment that includes a NIC in the TCB requires a supported NIC configuration, approved firmware, and encrypted PCIe links to the host.
+The Grace Blackwell baseline does not provide this trusted-NIC configuration.
+
+## Attestation and Key Release
+
+The infrastructure owner prepares the platform; the model owner prepares the software images and the attestation and key-release policies.
+The attestation policy defines which platform, software, and security settings the model owner approves.
+The key-release policy defines when a workload may receive model-decryption keys or other secrets, including requirements beyond successful attestation.
+The key-release service enforces that policy and delivers the secrets.
+
+After handoff, measured launch and checks of the runtime configuration gate key release.
+Before releasing model-decryption keys or other secrets, your verification and release flow must:
+
+1. Verify fresh CPU and device evidence against approved identities, reference values, and required security settings.
+2. Appraise authenticated launch logs to establish which of the model owner's software was launched.
+3. Apply the key-release policy and establish that the approved software and configuration will receive the secrets.
+4. Deliver secrets over a secure channel to that approved workload only when all required checks succeed.
+
+Reference values describe the expected measurements that a verifier compares against attestation evidence.
+NVIDIA and other suppliers provide reference values for components that the model owner decides whether to accept.
+You remain responsible for approving the OS, drivers, workload, and configuration that you operate.
+Attestation provides evidence about measured software and reported settings; attestation does not establish that approved code is free of vulnerabilities.
+
+## Limits and Exclusions
+
+- **Trusted software and services:** Compromised or malicious approved code can leak data. Compromised verifiers, false reference values, or unsafe attestation or key-release policies can admit an unsafe host.
+- **Tenant isolation:** CBM places the host under one model owner's control. Isolate mutually untrusted tenants on separate hosts or through confidential execution boundaries with isolated CPU/GPU resources and separate tenant administration.
+- **Physical attacks and side channels:** CBM does not provide general protection against invasive hardware attacks or timing, cache, and power side channels. Physical safeguards and platform-specific countermeasures remain necessary. Filtering telemetry does not remove every side channel.
+- **Unprotected communication paths:** Unencrypted links retain their physical-exposure limits. Protection of a selected protocol does not extend to all traffic on the same bus.
+- **Network and storage:** You must encrypt and authenticate sensitive data in storage, on the network, and on RDMA paths. NVLink encryption does not supply those protections.
+- **Availability:** The infrastructure owner can remove power or block traffic. CBM does not guarantee service availability against the infrastructure owner.
+
+## Protecting Tenant End-User Data From the Model Owner
+
+CBM alone does not provide this separation.
+An additional CVM can place an approved workload inside a CPU trusted execution environment (TEE) with protected GPU execution and encrypted device links.
+In that deployment, the model owner's host administrators can be outside the workload's trust boundary.
+
+The tenant end user or enterprise must still approve the guest software and data-handling policy and communicate with the authenticated workload endpoint.
+The deployment must constrain administrative access, logging, retention, and outbound traffic according to that policy.
+Reviewable software and release history support the tenant end user's appraisal; runtime controls enforce the approved data-handling policy.
+The model owner's key-release policy governs release of the model-decryption key.
+
+The approved guest software remains trusted with tenant end-user data.
