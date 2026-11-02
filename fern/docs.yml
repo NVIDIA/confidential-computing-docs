@@ -56,7 +56,7 @@ products:
     slug: bare-metal
     versions:
       - display-name: v1.0.0
-        ref: bare-metal-v1.0.0
+        ref: release-v1.0.0
         slug: v1.0.0
       - display-name: Dev
         path: ./products/bare-metal/current.yml
@@ -69,7 +69,7 @@ products:
     slug: virtual-machines
     versions:
       - display-name: v1.0.0
-        ref: virtual-machines-v1.0.0
+        ref: release-v1.0.0
         slug: v1.0.0
       - display-name: Dev
         path: ./products/virtual-machines/current.yml
