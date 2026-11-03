@@ -79,8 +79,8 @@ You then install Kata Containers and the NVIDIA GPU Operator.
 | --- | --- | --- |
 | [Kubernetes](https://kubernetes.io/) | 1.32 + | Prerequisite, must already be installed on the cluster hosts. |
 | [containerd](https://github.com/containerd/containerd) | 2.3.x | Prerequisite, must already be installed on the cluster hosts. |
-| [Kata Containers](https://katacontainers.io/) | ${kata_version} | Installed with the <code>kata-deploy</code> Helm chart by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
-| [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) and its components.Refer to the [GPU Operator Component Matrix](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#operator-component-matrix) for the list of components and versions included in each release. | ${gpu_operator_version} and higher | Installed by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
+| [Kata Containers](https://katacontainers.io/) | 4.0.0 | Installed with the <code>kata-deploy</code> Helm chart by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
+| [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) and its components.Refer to the [GPU Operator Component Matrix](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#operator-component-matrix) for the list of components and versions included in each release. | v26.3.1 and higher | Installed by following the [Quickstart Install](./install-quickstart.mdx) or [Detailed Install Guide](./confidential-containers-deploy.mdx). |
 
 ### Kata-provided Guest and Runtime Artifacts
 
@@ -89,10 +89,10 @@ You do not supply or install these artifacts individually.
 
 | Artifact | Release/Version |
 | --- | --- |
-| Guest OS | Distroless, with [NVRC ${nvrc_version}](https://github.com/NVIDIA/nvrc/releases/tag/${nvrc_version}), NVIDIA GPU driver ${guest_nvidia_driver_version}, and [guest-components ${guest_components_version}](https://github.com/confidential-containers/guest-components/releases/tag/${guest_components_version}) artifacts. |
-| Guest kernel | ${guest_kernel_version} |
+| Guest OS | Distroless, with [NVRC v0.1.5](https://github.com/NVIDIA/nvrc/releases/tag/v0.1.5), NVIDIA GPU driver 595.58.03, and [guest-components v0.21.0](https://github.com/confidential-containers/guest-components/releases/tag/v0.21.0) artifacts. |
+| Guest kernel | 6.18.35 |
 | [OVMF](https://github.com/tianocore/edk2) | edk2-stable202511 |
-| [QEMU](https://www.qemu.org/) | ${qemu_version} + Patches |
+| [QEMU](https://www.qemu.org/) | 11.0.1 + Patches |
 
 ### Separately Deployed Components and Interfaces
 
@@ -100,8 +100,8 @@ The following components and interfaces are not installed by the [Quickstart Ins
 
 | Interface or Component | Version | When It Is Needed | How It Is Provided |
 | --- | --- | --- | --- |
-| [Trustee](https://github.com/confidential-containers/trustee/releases/tag/${trustee_version}) | ${trustee_version} | Required for attestation and secret or key release. This architecture validates Trustee ${trustee_version} with guest-components ${guest_components_version} in the Kata guest. | The [Attestation](./attestation.mdx) quickstart installs a local evaluation Trustee ${trustee_version}. Deploy a production Trustee separately by following the upstream Confidential Containers documentation. |
+| [Trustee](https://github.com/confidential-containers/trustee/releases/tag/v0.21.0) | v0.21.0 | Required for attestation and secret or key release. This architecture validates Trustee v0.21.0 with guest-components v0.21.0 in the Kata guest. | The [Attestation](./attestation.mdx) quickstart installs a local evaluation Trustee v0.21.0. Deploy a production Trustee separately by following the upstream Confidential Containers documentation. |
 | [Kata Lifecycle Manager](https://github.com/kata-containers/lifecycle-manager) | 0.1.8 | Optional for Kata Containers upgrades and day-two lifecycle management. | Install separately by following the upstream Kata Lifecycle Manager documentation. |
-| [Kata Containers genpolicy](https://github.com/kata-containers/kata-containers/blob/${genpolicy_version}/src/tools/genpolicy/README.md) | ${genpolicy_version} | Used to generate an agent security policy for attested production workloads. Refer to [Attach a Kata Agent Security Policy](./configure-workloads.mdx#kata-agent-security-policy). | Download <code>genpolicy</code> ${genpolicy_version} from the [Kata Containers ${genpolicy_version} release](https://github.com/kata-containers/kata-containers/releases/tag/${genpolicy_version}). |
+| [Kata Containers genpolicy](https://github.com/kata-containers/kata-containers/blob/4.1.0/src/tools/genpolicy/README.md) | 4.1.0 | Used to generate an agent security policy for attested production workloads. Refer to [Attach a Kata Agent Security Policy](./configure-workloads.mdx#kata-agent-security-policy). | Download <code>genpolicy</code> 4.1.0 from the [Kata Containers 4.1.0 release](https://github.com/kata-containers/kata-containers/releases/tag/4.1.0). |
 
 Users may leverage [Red Hat OpenShift Sandboxed Containers](https://docs.redhat.com/en/documentation/openshift_sandboxed_containers/1.13) to deploy Confidential Containers.

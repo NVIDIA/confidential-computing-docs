@@ -1,0 +1,41 @@
+# Confidential virtual-machines v1.0.0 navigation.
+
+navigation:
+  - section: Confidential Virtual Machines
+    slug: ""
+    contents:
+      - page: Overview
+        path: ../../pages/virtual-machines/v1.0.0/index.mdx
+        slug: ""
+      - page: Supported Platforms
+        path: ../../pages/virtual-machines/v1.0.0/supported-platforms.mdx
+        slug: supported-platforms
+      - section: Deployment Guide
+        path: ../../pages/virtual-machines/v1.0.0/deployment-guide.mdx
+        slug: deployment-guide
+        collapsed: open-by-default
+        contents:
+          - page: Configuring the Hardware
+            path: ../../pages/virtual-machines/v1.0.0/deploy-hardware.mdx
+            slug: hardware
+          - page: Configuring the Host
+            path: ../../pages/virtual-machines/v1.0.0/deploy-host.mdx
+            slug: host
+          - page: Configuring the GPUs
+            path: ../../pages/virtual-machines/v1.0.0/deploy-gpu-mode.mdx
+            slug: gpu-mode
+          - page: Creating a Confidential VM
+            path: ../../pages/virtual-machines/v1.0.0/deploy-create-vm.mdx
+            slug: create-vm
+          - page: Configuring the Guest
+            path: ../../pages/virtual-machines/v1.0.0/deploy-guest.mdx
+            slug: guest
+          - page: Attesting the GPU
+            path: ../../pages/virtual-machines/v1.0.0/deploy-attest.mdx
+            slug: attest
+      - page: Trust and Threat Model
+        path: ../../pages/virtual-machines/v1.0.0/threat-model.mdx
+        slug: threat-model
+      - page: Licensing
+        path: ../../pages/virtual-machines/v1.0.0/licensing.mdx
+        slug: licensing

@@ -18,40 +18,41 @@ security issue, refer to [SECURITY.md](SECURITY.md).
 
 - `fern/fern.config.json`: the Fern organization (`nvidia`) and CLI version.
 - `fern/docs.yml`: the site settings, the product list, and the version list for each product.
-- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the unversioned landing product. Versioned deployment products serve `current.yml` as Dev. Released versions use either a version-specific navigation file or a Git ref.
-- `fern/products/bare-metal/v1.0.0.yml` and `fern/pages/bare-metal/v1.0.0/`: the navigation and content for the bare-metal v1.0.0 release.
+- `fern/products/<product>/current.yml`: the navigation for the current content of each product. `confidential-computing` is the unversioned landing product. Versioned deployment products serve `current.yml` as Dev.
+- `fern/products/<product>/<version>.yml` and `fern/pages/<product>/<version>/`: the navigation and content for each release.
 - `fern/pages/`: the MDX pages.
 
 ## Local Check
 
 ```bash
-npm install -g fern-api@5.143.2
+npm install -g fern-api@5.193.2
 cd fern && fern check --warnings
 ```
 
-A `ref:` entry under `products` needs the patched CLI that CI installs, until
-fern-api/fern#17950 is in a Fern release.
+CI uses the npm release specified in `fern/fern.config.json`. Update that
+version and the install command above together when upgrading Fern.
 
 ## Releases
 
-Versions are hand-managed in `fern/docs.yml`. Bare-metal v1.0.0 uses a
-version-specific navigation file and a copy of the release pages in the working
-tree. To update that release, edit its pages and merge the change to `main`.
-The corresponding bare-metal version entries look like this:
+Versions are hand-managed in `fern/docs.yml`. Each release has a
+version-specific navigation file and a copy of its pages and assets in the
+working tree. To update a release, edit its versioned pages and merge the
+change to `main`. For example, the bare-metal version entries look like this:
 
 ```yaml
     versions:
       - display-name: v1.0.0
         path: ./products/bare-metal/v1.0.0.yml
         slug: v1.0.0
-        availability: stable
       - display-name: Dev
         path: ./products/bare-metal/current.yml
         slug: dev
         availability: beta
 ```
 
-Fern builds the versioned bare-metal pages from the working tree. Other products
-currently use Git refs for their releases; for a ref-backed version, Fern builds
-the matching product's navigation and pages from that ref. Merging changes
-under `fern/` to `main` publishes the site; pushing a tag alone does not publish.
+To add a release, copy its pages and assets into a versioned directory, copy its
+navigation file and update the page paths, and add the version to `fern/docs.yml`.
+Keep release-specific shared pages in the versioned directory as well. Write
+component versions directly in the pages; product-level text substitutions are
+not supported by the upstream Fern CLI. Merging changes under `fern/` to `main`
+publishes the site; pushing a tag alone does not publish.

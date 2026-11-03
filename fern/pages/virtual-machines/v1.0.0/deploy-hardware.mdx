@@ -1,0 +1,46 @@
+---
+title: "Configuring the Hardware"
+description: "Select CPUs and GPUs for Confidential Computing and configure the BIOS for AMD SEV-SNP or Intel TDX."
+---
+
+The Hardware IT Administrator selects the CPUs and GPUs and configures the BIOS or UEFI so that the host OS administrator can enable Confidential Computing.
+
+## Selecting Hardware
+
+Confidential Computing requires CPUs and GPUs that provide the security features defined by the Confidential Computing Consortium.
+Refer to [Supported Platforms](./supported-platforms.mdx) for the CPUs, GPUs, and operating systems that NVIDIA supports.
+
+## Configuring the BIOS
+
+Configure the motherboard BIOS to enable the options that Confidential Computing requires.
+The following examples show the BIOS menus on systems that NVIDIA tested.
+Menu names and locations vary by motherboard vendor.
+
+### AMD
+
+| BIOS Menu | Setting | Value |
+| --- | --- | --- |
+| Advanced > CPU Configuration | SMEE | Enabled |
+| Advanced > CPU Configuration | SEV ASID Count | 509 ASIDs |
+| Advanced > CPU Configuration | SEV-ES ASID Space Limit Control | Manual |
+| Advanced > CPU Configuration | SEV-ES ASID Space Limit | 100 |
+| Advanced > CPU Configuration | SNP Memory Coverage | Enabled |
+| Advanced > NB Configuration | IOMMU | Enabled |
+| Advanced > NB Configuration | SEV-SNP Support | Enabled |
+
+### Intel
+
+| BIOS Menu | Setting | Value |
+| --- | --- | --- |
+| CPU Configuration > Processor Configuration | Limit CPU PA to 46 Bits | Disable |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Total Memory Encryption (Intel TME) | Enable |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Total Memory Encryption (Intel TME) Bypass | Auto |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Total Memory Encryption Multi-Tenant (Intel TME-MT) | Enable |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Memory Integrity | Disable |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Intel TDX | Enable |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | TDX Secure Arbitration Mode Loader (SEAM) | Enabled |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Disable excluding Mem below 1MB in CMR | Auto |
+| CPU Configuration > Processor Configuration > Intel TME, Intel TME-MT, Intel TDX | Intel TDX Key Split | A non-zero value |
+| CPU Configuration > Processor Configuration | Software Guard Extension | Enable |
+
+After you configure the BIOS, continue with [Configuring the Host](./deploy-host.mdx).
