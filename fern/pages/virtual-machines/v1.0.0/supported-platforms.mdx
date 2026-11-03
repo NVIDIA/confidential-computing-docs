@@ -1,0 +1,32 @@
+---
+title: "Supported Platforms"
+description: "CPUs, GPUs, and operating systems that NVIDIA supports for confidential virtual machines."
+---
+
+NVIDIA supports only the combinations of hardware and software in the following tables.
+For supported CUDA versions and NVIDIA GPU firmware, refer to the [Secure AI Compatibility Matrix](https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/).
+
+## Hardware Requirements
+
+- CPU:
+  - Intel CPUs with Intel Trust Domain Extensions (TDX) support, such as Emerald Rapids and Granite Rapids.
+  - AMD CPUs with Secure Encrypted Virtualization-Secure Nested Paging (SEV-SNP) support, such as Milan (7xx3), Genoa (9xx4), and Turin.
+- GPU: NVIDIA Hopper or Blackwell GPUs.
+- Motherboard: NVIDIA recommends a motherboard that you can configure with Secure Boot and with TDX or SEV-SNP.
+
+## Hopper GPUs
+
+| CPU | GPU Mode | Host OS | Guest OS |
+| --- | --- | --- | --- |
+| AMD Milan or Genoa | CC (single GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+| AMD Milan or Genoa | PPCIe (multi-GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+| Intel Emerald Rapids | CC (single GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+| Intel Emerald Rapids | PPCIe (multi-GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+
+## Blackwell GPUs
+
+| GPU | CPU | GPU Mode | Host OS | Guest OS |
+| --- | --- | --- | --- | --- |
+| NVIDIA RTX PRO 6000 | AMD SEV-SNP or Intel TDX | CC (single GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+| NVIDIA B200 | AMD SEV-SNP or Intel TDX | CC (single GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |
+| NVIDIA B200 | AMD SEV-SNP or Intel TDX | CC (multi-GPU) | Ubuntu 26.04 | Ubuntu 24.04 LTS |

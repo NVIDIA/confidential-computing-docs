@@ -69,7 +69,7 @@ products:
     slug: virtual-machines
     versions:
       - display-name: v1.0.0
-        ref: release-v1.0.0
+        path: ./products/virtual-machines/v1.0.0.yml
         slug: v1.0.0
       - display-name: Dev
         path: ./products/virtual-machines/current.yml
@@ -82,10 +82,10 @@ products:
     slug: containers
     versions:
       - display-name: v1.1.0
-        ref: containers-v1.1.0
+        path: ./products/containers/v1.1.0.yml
         slug: v1.1.0
       - display-name: v1.0.0
-        ref: containers-v1.0.0
+        path: ./products/containers/v1.0.0.yml
         slug: v1.0.0
       - display-name: Dev
         path: ./products/containers/current.yml

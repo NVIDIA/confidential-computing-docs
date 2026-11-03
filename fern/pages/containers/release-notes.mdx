@@ -27,7 +27,7 @@ This release expands hardware coverage and updates the validated software stack.
 
 - Added support for the following software components:
 
-  -   Kata Containers ${kata_version}
+  -   Kata Containers 4.0.0
 
   -   Kata Lifecycle Manager 0.1.8
 
@@ -60,10 +60,10 @@ Refer to [Attach a Kata Agent Security Policy](./configure-workloads.mdx#kata-ag
 
 - Updated the guest kernel and QEMU versions to match the Kata Containers artifacts this architecture installs.
 
-- Replaced the Key Broker Service protocol version with Trustee ${trustee_version} as the separately deployed attestation component.
+- Replaced the Key Broker Service protocol version with Trustee v0.21.0 as the separately deployed attestation component.
 The [Attestation](./attestation.mdx) quickstart clones that Trustee tag, documents Compose image pins for KBS, AS, and RVPS to that commit, and pulls the matching `kbs-client` artifact.
 
-- Pinned `genpolicy` to ${genpolicy_version} and pointed the download and README links at that Kata Containers release.
+- Pinned `genpolicy` to 4.1.0 and pointed the download and README links at that Kata Containers release.
 
 - Restored `--wait` on the detailed `kata-deploy` install command and attributed the disabled NFD deployment to the values file.
 

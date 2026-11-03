@@ -107,11 +107,11 @@ Refer to the [ORAS installation guide](https://oras.land/docs/installation) if O
 ### Step 1: Install Trustee with Docker Compose
 
 Installing Trustee with Docker Compose is the recommended install path.
-Clone the upstream Trustee repository at ${trustee_version}.
+Clone the upstream Trustee repository at v0.21.0.
 The repository ships with a `docker-compose.yml` that wires KBS, the Attestation Service, and the Reference Value Provider Service together.
 
 ```console
-git clone --branch ${trustee_version} --depth 1 https://github.com/confidential-containers/trustee.git && cd trustee
+git clone --branch v0.21.0 --depth 1 https://github.com/confidential-containers/trustee.git && cd trustee
 ```
 
 Start the Trustee containers in the background.
@@ -137,20 +137,20 @@ This step can take several minutes. The command returns after the containers sta
 </Note>
 
 <Note>
-The Trustee ${trustee_version} [docker-compose.yml](https://github.com/confidential-containers/trustee/blob/${trustee_version}/docker-compose.yml) still references `:latest` images for KBS, AS, and RVPS.
+The Trustee v0.21.0 [docker-compose.yml](https://github.com/confidential-containers/trustee/blob/v0.21.0/docker-compose.yml) still references `:latest` images for KBS, AS, and RVPS.
 While cloning that tag pins the compose configuration to a released version, `docker compose up -d` still pulls whatever `:latest` resolves to at that time.
-`:latest` does not match Trustee ${trustee_version}.
+`:latest` does not match Trustee v0.21.0.
 For a reproducible backend that matches this architecture, replace the three `image:` lines before you run `docker compose up -d`:
 
-- KBS: `ghcr.io/confidential-containers/staged-images/kbs-grpc-as:${trustee_image_tag}`
+- KBS: `ghcr.io/confidential-containers/staged-images/kbs-grpc-as:258ea4acb7b9bd865fce5c63a539f2120dba8298`
 
-- AS: `ghcr.io/confidential-containers/staged-images/coco-as-grpc:${trustee_image_tag}`
+- AS: `ghcr.io/confidential-containers/staged-images/coco-as-grpc:258ea4acb7b9bd865fce5c63a539f2120dba8298`
 
-- RVPS: `ghcr.io/confidential-containers/staged-images/rvps:${trustee_image_tag}`
+- RVPS: `ghcr.io/confidential-containers/staged-images/rvps:258ea4acb7b9bd865fce5c63a539f2120dba8298`
 
-Those tags are the Trustee ${trustee_version} commit, the same commit as the `kbs-client` artifact in the next step.
-The GHCR registry does not publish a `${trustee_version}` tag for these images.
-Equivalent digest pins are `kbs-grpc-as@${trustee_kbs_image_digest}`, `coco-as-grpc@${trustee_as_image_digest}`, and `rvps@${trustee_rvps_image_digest}`.
+Those tags are the Trustee v0.21.0 commit, the same commit as the `kbs-client` artifact in the next step.
+The GHCR registry does not publish a `v0.21.0` tag for these images.
+Equivalent digest pins are `kbs-grpc-as@sha256:873a1e1704965d1325b70fdf31335cc8d9c95acab4f003b0f3ece675b3584dd8`, `coco-as-grpc@sha256:5319dcb609ed1d61876491bb43be1e03838f29eab7cea5673c7979892dc8015a`, and `rvps@sha256:185cdc6754e544de3068a4f9c25733d62e7e6cfb8464da9f2de2ac490573b509`.
 This edit is unnecessary after Trustee starts pinning images in the release compose file.
 
 </Note>
@@ -194,11 +194,11 @@ Use the `kbs-client`, installed in the next step, instead.
 
 The KBS client tool, `kbs-client`, is distributed as a container artifact in the Confidential Containers GitHub Container Registry.
 This tool is mainly used for configuring Trustee.
-The registry does not publish a `${trustee_version}` tag for this artifact.
-Pull the `sample_only` build for the Trustee ${trustee_version} commit on `x86_64`.
+The registry does not publish a `v0.21.0` tag for this artifact.
+Pull the `sample_only` build for the Trustee v0.21.0 commit on `x86_64`.
 
 ```console
-oras pull ghcr.io/confidential-containers/staged-images/kbs-client:${kbs_client_tag}
+oras pull ghcr.io/confidential-containers/staged-images/kbs-client:sample_only-258ea4acb7b9bd865fce5c63a539f2120dba8298-x86_64
 ```
 
 *Example Output:*
@@ -206,7 +206,7 @@ oras pull ghcr.io/confidential-containers/staged-images/kbs-client:${kbs_client_
 ```output
 Downloading 5148271f5a55 kbs-client
 Downloaded  5148271f5a55 kbs-client
-Pulled [registry] ghcr.io/confidential-containers/staged-images/kbs-client:${kbs_client_tag}
+Pulled [registry] ghcr.io/confidential-containers/staged-images/kbs-client:sample_only-258ea4acb7b9bd865fce5c63a539f2120dba8298-x86_64
 Digest: sha256:429be62c527e766a9854f9dac37f878010069c4aa6745d3d555d2bf393b9e82e
 ```
 

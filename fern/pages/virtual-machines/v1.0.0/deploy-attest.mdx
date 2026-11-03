@@ -1,0 +1,57 @@
+---
+title: "Attesting the GPU"
+description: "Verify the Confidential Computing configuration, attest the GPU, and set the GPU ready state in a confidential virtual machine."
+---
+
+The Virtual Machine User runs confidential applications in a CVM that is configured for Confidential Computing.
+The Virtual Machine User might also be the [Virtual Machine Administrator](./deploy-guest.mdx).
+NVIDIA recommends that you work in the `/shared` directory in the guest.
+
+Before you run workloads, attest the GPU to confirm that the system is authentic and valid.
+During attestation, the GPU collects and signs measurements, and the verifier compares the measurements to known-good reference measurements.
+After attestation succeeds, set the GPU ready state.
+
+<Note>
+The GPU doesn't accept work until a user in the CVM sets the ready state.
+This restriction prevents use of the GPU before you confirm that the GPU is trustworthy.
+A succcessful attestation does not set the ready state automatically.
+After attestation succeeds, set the ready state with the following command:
+
+```console
+$ nvidia-smi conf-compute -srs 1
+```
+</Note>
+
+## Validating the Configuration
+
+1. If you didn't configure the guest yourself, confirm that `nvidia-persistenced` is running:
+
+   ```console
+   $ ps -aux | grep nvidia-persistenced
+   root        2327 20.1  0.0   5312  1788 ?        Ss   08:57   0:05 nvidia-persistenced
+   ```
+
+   If the output shows only the `grep` command, start `nvidia-persistenced`:
+
+   ```console
+   $ sudo nvidia-persistenced
+   ```
+
+1. Confirm that the GPU runs in the Confidential Computing mode that you expect:
+
+   ```console
+   $ nvidia-smi conf-compute -f
+   CC status: ON
+   ```
+
+## Attesting the GPU
+
+1. Install the NVIDIA Attestestion SDK (NVAT) and attest the GPU.
+   Refer to the [NVAT documentation](https://docs.nvidia.com/attestation/nv-attestation-sdk-cpp/latest/overview.html)
+   for installation and attestation instructions.
+
+1. After attestation succeeds, enable the GPU to accept work:
+
+   ```console
+   $ nvidia-smi conf-compute -srs 1
+   ```

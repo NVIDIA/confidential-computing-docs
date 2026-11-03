@@ -1,0 +1,283 @@
+---
+title: "Prerequisites"
+license: Apache-2.0
+copyright: "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved."
+description: "As a Kubernetes Cluster Administrator, prepare hosts and the Kubernetes cluster before you install Kata Containers and the NVIDIA GPU Operator."
+---
+
+<Anchor id="coco-prerequisites"></Anchor>
+
+As a [Kubernetes Cluster Administrator](./personas.mdx#coco-persona-kubernetes-cluster-administrator), prepare hosts and the Kubernetes cluster before you install Kata Containers and the NVIDIA GPU Operator.
+You perform most steps in this section.
+If you do not have access to host firmware, coordinate with your [Hardware IT Administrator](./personas.mdx#coco-persona-hardware-it-administrator) or [Host OS Administrator](./personas.mdx#coco-persona-host-os-administrator) to confirm or implement hardware prerequisites.
+
+For validated hardware and software versions, refer to [Supported Platforms](./supported-platforms.mdx).
+Use the checklists below for an at-a-glance summary, then follow each linked section for verification steps.
+
+**Hardware prerequisites**
+
+| Prerequisite | Details |
+| --- | --- |
+| [Use a supported platform](#coco-prereq-supported-platform) | CPU, GPU, and host OS match [Supported Platforms](./supported-platforms.mdx) |
+| [Hardware virtualization and ACS enabled](#coco-prereq-hw-virtualization) | Hardware virtualization and ACS enabled in host BIOS |
+| [IOMMU enabled](#coco-prereq-iommu) | IOMMU enabled on each host through the kernel command line (<code>amd&#95;iommu=on</code> or <code>intel&#95;iommu=on</code>) |
+| [No host NVIDIA GPU drivers](#coco-prereq-no-host-drivers) | No NVIDIA GPU drivers installed or loaded on worker hosts. |
+
+**Cluster prerequisites**
+
+| Prerequisite | Details |
+| --- | --- |
+| [A Kubernetes cluster and cluster administrator access](#coco-prereq-cluster-admin) | Cluster administrator access to a Kubernetes cluster running a supported version (refer to [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components)) |
+| [containerd 2.2.2 installed](#coco-prereq-containerd) | containerd 2.2.2 installed on each GPU worker node |
+| [Helm installed](#coco-prereq-helm) | Helm installed on your cluster administration system |
+| [Kubelet configured](#coco-prereq-kubelet) | Enable <code>KubeletPodResourcesGet</code> (required before Kubernetes v1.34) and <code>RuntimeClassInImageCriApi</code> feature gates; set <code>runtimeRequestTimeout: 20m</code> on GPU worker nodes |
+
+## Hardware and BIOS
+
+<Anchor id="coco-prereq-supported-platform"></Anchor>
+
+### Supported Platform
+
+Your hosts must use a platform validated for Confidential Computing in [Supported Platforms](./supported-platforms.mdx).
+Confirm with your [Hardware IT Administrator](./personas.mdx#coco-persona-hardware-it-administrator) and [Host OS Administrator](./personas.mdx#coco-persona-host-os-administrator) that any platform-specific BIOS, firmware, or OS steps are in place before continuing.
+
+<Anchor id="coco-prereq-hw-virtualization"></Anchor>
+
+### Hardware Virtualization and ACS Enabled
+
+Confirm with your [Hardware IT Administrator](./personas.mdx#coco-persona-hardware-it-administrator) that your hosts are configured to enable hardware virtualization and Access Control Services (ACS).
+With some AMD CPUs and BIOSes, ACS might be grouped under Advanced Error Reporting (AER).
+Enable these features in the host BIOS if they are not already enabled.
+
+<Anchor id="coco-prereq-iommu"></Anchor>
+
+### IOMMU Enabled
+
+IOMMU must be enabled on all hosts that will run Confidential Containers workloads.
+
+1. Check whether IOMMU is already enabled:
+
+   ```console
+   ls /sys/kernel/iommu_groups
+   ```
+
+   If the output lists numbered groups (`0`, `1`, and so on), IOMMU is enabled.
+
+   If the output is empty or the directory is missing, IOMMU is not enabled.
+
+1. If IOMMU is not enabled, add the appropriate kernel command-line argument to `/etc/default/grub`:
+
+   -    `amd_iommu=on` for AMD CPUs
+
+   -    `intel_iommu=on` for Intel CPUs
+
+<Tabs>
+  <Tab title="AMD-based system (SNP)" language="amd-snp">
+   ```console
+   ...
+   GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on modprobe.blacklist=nouveau"
+   ...
+   ```
+
+  </Tab>
+  <Tab title="Intel-based system (TDX)" language="intel-tdx">
+   ```console
+   ...
+   GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on modprobe.blacklist=nouveau"
+   ...
+   ```
+
+  </Tab>
+
+</Tabs>
+
+1. Update the bootloader configuration:
+
+   ```console
+   sudo update-grub
+   ```
+
+   *Example Output:*
+
+   ```output
+   Sourcing file `/etc/default/grub'
+   Generating grub configuration file ...
+   Found linux image: /boot/vmlinuz-5.15.0-generic
+   Found initrd image: /boot/initrd.img-5.15.0-generic
+   done
+   ```
+
+1. Reboot the host.
+
+<Note>
+After configuring IOMMU, you might see QEMU warnings about PCI P2P DMA when running GPU workloads.
+These are expected and can be safely ignored.
+Refer to [Limitations and Restrictions](./overview.mdx#coco-limitations) for details.
+
+</Note>
+
+<Anchor id="coco-prereq-no-host-drivers"></Anchor>
+
+### Ensure No Host NVIDIA GPU Drivers Are Present
+
+Confidential Containers pass GPUs to the confidential virtual machine through VFIO.
+Host-installed NVIDIA drivers prevent VFIO from binding the devices and must not be present on those hosts.
+In this architecture, the NVIDIA GPU Operator handles GPU driver installation and lifecycle management when you follow the [Detailed Install Guide](./confidential-containers-deploy.mdx).
+
+1. On each host, check whether NVIDIA GPU drivers are loaded:
+
+   ```console
+   lsmod | grep nvidia
+   ```
+
+   If the command produces no output, no NVIDIA GPU drivers are loaded.
+
+1. If drivers are installed or loaded on any host, remove them.
+
+   Refer to [Removing the Driver](https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/removing-the-driver.html) in the NVIDIA Driver Installation Guide.
+
+## Kubernetes Cluster
+
+The following sections describe requirements for worker nodes and for the system you use for cluster administration.
+
+<Anchor id="coco-prereq-cluster-admin"></Anchor>
+
+### Kubernetes Cluster and Cluster Administrator Access
+
+You must have cluster administrator access to a Kubernetes cluster running a supported Kubernetes version.
+Refer to the [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components) section in [Supported Platforms](./supported-platforms.mdx) for supported Kubernetes and component versions.
+
+<Anchor id="coco-prereq-containerd"></Anchor>
+
+### containerd 2.2.2
+
+Verify the installed version on each GPU worker node:
+
+```console
+containerd --version
+```
+
+*Example Output:*
+
+```output
+containerd containerd.io 2.2.2 ...
+```
+
+Your actual output may vary, but the reported version must be `2.2.2`.
+If you are running a different version on any worker node, refer to the [containerd Getting Started guide](https://containerd.io/docs/2.2/getting-started/) for installation instructions.
+
+<Anchor id="coco-prereq-helm"></Anchor>
+
+### Helm
+
+Helm is used to install the NVIDIA GPU Operator and Kata Containers.
+
+Verify that Helm is installed on the system you use for cluster administration:
+
+```console
+helm version
+```
+
+*Example Output:*
+
+```output
+version.BuildInfo{Version:"v3.14.0", GitCommit:"...", GitTreeState:"clean", GoVersion:"go1.21.6"}
+```
+
+Your exact version details may vary.
+
+If Helm is not installed or the command is not found, refer to the [Helm documentation](https://helm.sh/docs/intro/install/) for installation instructions.
+
+<Anchor id="coco-prereq-kubelet"></Anchor>
+
+<Anchor id="configure-image-pull-timeouts"></Anchor>
+
+### Kubelet Configured
+
+On GPU worker nodes, the kubelet configuration (typically `/var/lib/kubelet/config.yaml`) must include the required feature gates and an extended image pull timeout.
+
+Confidential Containers require these kubelet feature gates:
+
+- `KubeletPodResourcesGet`: Allows the Kata runtime to query the kubelet Pod Resources API and discover GPUs allocated to a sandbox.
+
+- `RuntimeClassInImageCriApi`: Alpha since Kubernetes v1.29; required for pods that use multiple snapshotters side by side.
+
+On Kubernetes v1.34 and later, `KubeletPodResourcesGet` is enabled by default.
+On versions before v1.34, enable it explicitly.
+`RuntimeClassInImageCriApi` must be enabled explicitly on all supported versions.
+
+Increase the `runtimeRequestTimeout` from the 2-minute default to `20m` to avoid timeouts when pulling large GPU workload images.
+If a pull exceeds the timeout before the container is running, the kubelet de-allocates the pod.
+Actual pull duration varies with image size and network throughput, so this guide uses 20 minutes as a conservative ceiling that accommodates most workload images.
+
+Apply these settings as follows:
+
+1. Open the kubelet configuration file:
+
+   ```console
+   sudo nano /var/lib/kubelet/config.yaml
+   ```
+
+   This is typically located at `/var/lib/kubelet/config.yaml`, but your configuration file may be in a different location.
+
+1. Add the required settings to the kubelet configuration file.
+Select the tab that matches your Kubernetes version:
+
+<Tabs>
+  <Tab title="Kubernetes v1.34 and later" language="k8s-1-34-plus">
+   ```yaml
+   apiVersion: kubelet.config.k8s.io/v1beta1
+   kind: KubeletConfiguration
+   featureGates:
+     RuntimeClassInImageCriApi: true
+   runtimeRequestTimeout: 20m
+   ```
+
+  </Tab>
+  <Tab title="Kubernetes earlier than v1.34" language="k8s-pre-1-34">
+   ```yaml
+   apiVersion: kubelet.config.k8s.io/v1beta1
+   kind: KubeletConfiguration
+   featureGates:
+     KubeletPodResourcesGet: true
+     RuntimeClassInImageCriApi: true
+   runtimeRequestTimeout: 20m
+   ```
+
+  </Tab>
+
+</Tabs>
+
+   If your kubelet configuration already defines `featureGates` or `runtimeRequestTimeout`, merge these settings into the existing file instead of replacing it.
+
+1. Restart the kubelet service:
+
+   ```console
+   sudo systemctl restart kubelet
+   ```
+
+1. Confirm the kubelet restarted cleanly with the new configuration:
+
+   ```console
+   systemctl is-active kubelet
+   ```
+
+   *Example Output:*
+
+   ```output
+   active
+   ```
+
+   A result of `active` confirms the kubelet restarted successfully.
+If it reports `activating` or `failed`, inspect `sudo systemctl status kubelet` and `sudo journalctl -u kubelet` for configuration errors before continuing.
+
+<Note>
+If you need a timeout longer than 1200 seconds (20 minutes), consider also adjust the Kata Agent `image_pull_timeout`.
+This setting controls the Confidential Data Hub image pull API timeout in seconds.
+Add the `agent.image_pull_timeout` kernel parameter to your shim configuration, or pass a value in the pod annotation `io.katacontainers.config.hypervisor.kernel_params`.
+
+</Note>
+
+## Next Steps
+
+After completing the prerequisites, proceed to [Quickstart Install](./install-quickstart.mdx) for a minimal install, or [Detailed Install Guide](./confidential-containers-deploy.mdx) for full configuration details.

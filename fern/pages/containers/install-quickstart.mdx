@@ -38,7 +38,7 @@ By the end of this quickstart, you will have:
 1. Set the chart version and registry path:
 
    ```console
-   export VERSION="${kata_version}"
+   export VERSION="4.0.0"
    export CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
    ```
 
@@ -59,7 +59,7 @@ By the end of this quickstart, you will have:
    *Example Output:*
 
    ```output
-   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:${kata_version}
+   Pulled: ghcr.io/kata-containers/kata-deploy-charts/kata-deploy:4.0.0
    Digest: sha256:aea41018779716ce2e0bf406d701637d10fb5a0792db51a08dfd3f76701eb933
    LAST DEPLOYED: Wed Apr  1 17:03:00 2026
    NAMESPACE: kata-system
@@ -150,7 +150,7 @@ Otherwise, refer to [Troubleshooting](./troubleshooting.mdx).
       --set sandboxWorkloads.mode=kata \
       --set nfd.enabled=true \
       --set nfd.nodefeaturerules=true \
-      --version=${gpu_operator_version}
+      --version=v26.3.1
    ```
 
    *Example Output:*

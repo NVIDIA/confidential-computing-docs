@@ -306,13 +306,13 @@ Do not treat that YAML as a production template.
 The Kata Containers `genpolicy` tool reads your Kubernetes YAML, infers the intended Agent API
 calls, encodes the policy in base64, and appends it as an annotation on the same file.
 The Kata agent in the guest receives that annotation.
-Use `genpolicy` ${genpolicy_version}, which is the version this architecture validates with that agent.
+Use `genpolicy` 4.1.0, which is the version this architecture validates with that agent.
 Refer to [Supported Software Components](./supported-platforms.mdx#coco-supported-software-components) for the component matrix.
 
-1. Download `genpolicy` ${genpolicy_version} from the
-[Kata Containers ${genpolicy_version} release](https://github.com/kata-containers/kata-containers/releases/tag/${genpolicy_version}).
+1. Download `genpolicy` 4.1.0 from the
+[Kata Containers 4.1.0 release](https://github.com/kata-containers/kata-containers/releases/tag/4.1.0).
 For usage details, refer to the
-[Agent Policy generation tool](https://github.com/kata-containers/kata-containers/blob/${genpolicy_version}/src/tools/genpolicy/README.md)
+[Agent Policy generation tool](https://github.com/kata-containers/kata-containers/blob/4.1.0/src/tools/genpolicy/README.md)
 documentation.
 
 1. Run `genpolicy` against the manifest to deploy:

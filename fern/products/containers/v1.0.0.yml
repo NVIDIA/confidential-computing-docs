@@ -1,0 +1,57 @@
+# Confidential containers v1.0.0 navigation.
+
+navigation:
+  - page: Overview
+    path: ../../pages/containers/v1.0.0/index.mdx
+    slug: ""
+  - section: Learn
+    skip-slug: true
+    contents:
+      - page: Reference Architecture
+        path: ../../pages/containers/v1.0.0/overview.mdx
+        slug: overview
+      - page: Personas
+        path: ../../pages/containers/v1.0.0/personas.mdx
+        slug: personas
+      - page: Supported Platforms
+        path: ../../pages/containers/v1.0.0/supported-platforms.mdx
+        slug: supported-platforms
+  - section: Install
+    skip-slug: true
+    contents:
+      - page: Prerequisites
+        path: ../../pages/containers/v1.0.0/prerequisites.mdx
+        slug: prerequisites
+      - page: Quickstart Install
+        path: ../../pages/containers/v1.0.0/install-quickstart.mdx
+        slug: install-quickstart
+      - page: Detailed Install Guide
+        path: ../../pages/containers/v1.0.0/confidential-containers-deploy.mdx
+        slug: confidential-containers-deploy
+      - page: Run a Sample Workload
+        path: ../../pages/containers/v1.0.0/run-sample-workload.mdx
+        slug: run-sample-workload
+  - section: Configuration
+    skip-slug: true
+    contents:
+      - page: Configuring Workloads
+        path: ../../pages/containers/v1.0.0/configure-workloads.mdx
+        slug: configure-workloads
+      - page: Managing the Confidential Computing Mode
+        path: ../../pages/containers/v1.0.0/configure-cc-mode.mdx
+        slug: configure-cc-mode
+      - page: Attestation
+        path: ../../pages/containers/v1.0.0/attestation.mdx
+        slug: attestation
+  - section: Reference
+    skip-slug: true
+    contents:
+      - page: Troubleshooting
+        path: ../../pages/containers/v1.0.0/troubleshooting.mdx
+        slug: troubleshooting
+      - page: Release Notes
+        path: ../../pages/containers/v1.0.0/release-notes.mdx
+        slug: release-notes
+      - page: Licensing
+        path: ../../pages/containers/v1.0.0/licensing.mdx
+        slug: licensing
