@@ -1,0 +1,87 @@
+---
+title: "Platform Compatibility Matrix"
+sidebar-title: "Compatibility Matrix"
+description: "Find supported combinations of NVIDIA GPUs, firmware, drivers, and confidential computing modes."
+layout: reference
+---
+
+Select filters and then click **Submit** to find supported combinations of GPUs, VBIOS versions, CUDA drivers, and confidential computing modes.
+The matrix also lists form factors, RIM status, VBIOS RIMs, and SKUs.
+For information about `CERT_HOLD` RIM status, refer to the [GPU verifier documentation](https://github.com/NVIDIA/nvtrust/blob/main/guest_tools/gpu_verifiers/local_gpu_verifier/README.md).
+
+## Firmware Notes
+
+- For Protected PCIe mode, use HGX Hopper firmware 1.7.0. Firmware 1.6.0 has a known issue that can cause the GPU to fall off the bus during boot.
+- When using Secure AI with HGX Hopper firmware 1.8.0 or later, rollback to firmware 1.7.1 or earlier is not supported.
+
+<style>
+{`
+.compatibility-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.compatibility-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.compatibility-filters select {
+  color: inherit;
+  background: var(--background);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.4rem;
+  max-width: 100%;
+}
+
+.compatibility-table-wrapper {
+  overflow-x: auto;
+}
+
+.compatibility-table-wrapper table {
+  min-width: 1100px;
+}
+
+.compatibility-navigation {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.compatibility-navigation[hidden] {
+  display: none;
+}
+
+.compatibility-navigation button,
+.compatibility-submit {
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+}
+
+.compatibility-navigation button:disabled {
+  opacity: 0.5;
+}
+`}
+</style>
+
+## Find a Supported Combination
+
+<div id="compatibility-matrix">Enable JavaScript to filter the compatibility matrix, or download the CSV files below.</div>
+
+## Download the Data
+
+The CSV files contain the authoritative matrix data, including all supported combinations.
+
+- <Download src="../../data/compatibility/h100.csv">H100 CSV</Download>
+- <Download src="../../data/compatibility/h200.csv">H200 CSV</Download>
+- <Download src="../../data/compatibility/h20.csv">H20 CSV</Download>
+- <Download src="../../data/compatibility/h800.csv">H800 CSV</Download>
+- <Download src="../../data/compatibility/b200.csv">B200 CSV</Download>
+- <Download src="../../data/compatibility/b300.csv">B300 CSV</Download>
+- <Download src="../../data/compatibility/rtx-pro-6000.csv">RTX PRO 6000 CSV</Download>

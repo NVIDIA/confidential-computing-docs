@@ -36,6 +36,9 @@ favicon: ./assets/NVIDIA_symbol.svg
 css:
   - ./main.css
 
+js:
+  - ./scripts/compatibility-matrix.js
+
 check:
   rules:
     broken-links: error
