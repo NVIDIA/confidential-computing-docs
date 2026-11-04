@@ -1,0 +1,180 @@
+---
+title: "R595 TRD1 Release Notes"
+description: "NVIDIA Trusted Computing Solutions R595 TRD1 release notes."
+---
+
+## Overview
+
+This release consists of the NVIDIA CUDA Toolkit version 13.2, which is paired with the NVIDIA Data Center GPU Drivers version 595.58.03.
+
+The following features are supported in this software release:
+
+- Single GPU Passthrough (SPT CC)
+
+- Hopper Multiple GPU Passthrough with Protected PCIe (PPCIe)
+
+- Blackwell Multiple GPU Passthrough (MPT CC)
+
+For more information about these features, refer to Feature Summary.
+
+For additional information, refer to the following documentation:
+
+- [Platform Compatibility Matrix](https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/) for most up to date information about supported platforms, drivers, firmware, and Secure AI modes
+
+- [Secure AI Deployment Guide](https://docs.nvidia.com/cc-deployment-guide-tdx.pdf) for details about setting up the confidential computing system
+
+- [Secure AI Operations Guide](https://docs.nvidia.com/nvidia-secure-ai-operations-guide.pdf) for best practices and CUDA developer considerations
+
+Before you deploy workloads, NVIDIA recommends that users use good practices, such as performing regular attestations.
+
+## Feature Summary
+
+This section provides information about the CC features in this release. For more details on Secure AI modes, security posture, and capabilities, please refer to the [NVIDIA Secure AI with Blackwell and Hopper GPUs](https://docs.nvidia.com/nvidia-secure-ai-with-blackwell-and-hopper-gpus-whitepaper.pdf) whitepaper. This release primarily adds support for new Hopper and Blackwell platforms — please see highlighted hardware SKUs.
+
+### Single GPU Passthrough (SPT CC)
+
+NVIDIA Trusted Computing support for NVIDIA Hopper GPUs was first introduced with the Hopper Single GPU Passthrough with a Bounce Buffer (SPT CC) mode. SPT CC mode support for Blackwell GPUs was also added in subsequent releases. In this mode, one GPU can be passed through for each Confidential VM (CVM). Multiple CVMs may be hosted on the same node, each with one GPU passed through. A bounce buffer stages encrypted data transfers between the GPU device and the CVM.
+
+The following are the hardware SKUs that support SPT CC mode:
+
+  - NVIDIA H100 PCIe
+
+  - NVIDIA H800 PCIe
+
+  - NVIDIA H100NVL
+
+  - NVIDIA H800NVL
+
+  - NVIDIA H200NVL
+
+  - HGX H100 8-GPU 80GB (Air Cooled)
+
+  - HGX H100 4-GPU 80GB HBM3 (Partner Cooled)
+
+  - HGX H800 8-GPU 80GB (Air Cooled)
+
+  - HGX H800 8-GPU 80GB (Partner Cooled)
+
+  - HGX H100 4-GPU 64GB HBM2e (Partner Cooled)
+
+  - HGX H100 8-GPU 96GB (Air Cooled)
+
+  - HGX H100 4-GPU 94GB HBM2e (Partner Cooled)
+
+  - HGX H20A HBM3 96GB 8-GPU (Air Cooled)
+
+  - HGX H20 141GB HBM3e 8-GPU (Air Cooled)
+
+  - HGX H200 8-GPU 141GB (Air Cooled)
+
+  - HGX B200, 8-GPU, SXM6 180GB HBM3e, AC
+
+  - RTX PRO 6000 Blackwell Server Edition
+
+  - RTX PRO 6000 Blackwell Server Edition, LC New
+
+  - HGX B200-850, 8-GPU, SXM6 180GB HBM3e, AC
+
+  - HGX B200, 8-GPU, SXM6 180GB HBM3e, PC New
+
+  - HGX B300, 8-GPU, SXM6 270GB HBM3e, AC New
+
+Refer to the [Intel TDX - Confidential Computing Deployment Guide and AMD SNP - Confidential Computing Deployment Guide](https://docs.nvidia.com/cc-deployment-guide-tdx.pdf) for more information.
+
+**Table 1. Component Versions to Enable SPT CC Mode**
+
+| Component | Version |
+| --- | --- |
+| VBIOS | H100/H200: Hopper FW 1.9.0 [96.00.DA.00.XX]<br />H20A: 96.00.DA.00.10<br />B200: HGX B200/B300 FW 1.4.X [97.00.E4.00.XX]<br />B300: HGX B200/B300 FW 1.4.X [97.10.64.00.XX]<br />RTX 6000 FW 1.4 [98.02.AF.00.02]<br />Refer to the [Platform Compatibility Matrix](https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/) for more information about<br />supported platforms, drivers, firmware, and Secure AI modes |
+| Host OS Kernel | Intel : Ubuntu 25.10 / 6.17.0+<br />AMD SEV/SEV-SNP : Ubuntu 25.04 / 6.14+ |
+| Guest OS | Ubuntu 24.04 |
+| `gpu_admin.py` | The main branch is [github.com/nvidia/nvtrust](https://github.com/nvidia/nvtrust).<br />GPU tools - v2025.11.21 |
+| Attestation SDK<br />Local GPU Verifier | Version 2.6.0 or later |
+
+### Hopper Multiple GPU Passthrough (Protected PCIe)
+
+Trusted Computing support in the PPCIe mode is available with Hopper-architecture GPUs and Intel CPUs with TDX/AMD CPUs with SEV/SEV-SNP technology in an Ubuntu KVM/QEMU environment.
+
+In the PPCIe mode, multiple Hopper-architecture GPUs interconnected by NVSwitch or NVLink can be passed through to one CVM. As in the SPT CC mode, a bounce buffer is used to stage encrypted data transfers between the GPU device and CVM over the PCI Express bus. In this mode, GPU-GPU communications over the NVLink or NVSwitch interconnect are not encrypted.
+
+The following are the hardware SKUs that support PPCIe mode:
+
+  - HGX H100 8-GPU 80GB (Air Cooled)
+
+  - HGX H800 8-GPU 80GB (Air Cooled)
+
+  - HGX H100 8-GPU 96GB (Air Cooled)
+
+  - HGX H20A HBM3 96GB 8-GPU (Air Cooled)
+
+  - HGX H200 8-GPU 141GB (Air Cooled)
+
+**Table 2. Component Versions to Enable PPCIe**
+
+| Component | Version |
+| --- | --- |
+| HGX Hopper FW bundle | HGX Hopper FW 1.9.0 [96.00.DA.00.XX]<br />Refer to the [Platform Compatibility Matrix](https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/) for more information about supported<br />platforms, drivers, firmware, and Secure AI modes |
+| Host OS Kernel | Intel : Ubuntu 25.10 / 6.17.0+<br />AMD SEV/SEV-SNP : Ubuntu 25.04 / 6.14+ |
+| Guest OS | Ubuntu 24.04 |
+| `gpu_admin.py` | The main branch is [github.com/nvidia/nvtrust](https://github.com/nvidia/nvtrust).<br />GPU tools - v2025.11.21 |
+| PPCIE Verifier | Version 1.6.0 or later |
+
+### Blackwell Multiple GPU Passthrough (MPT CC)
+
+This release introduces support for Blackwell Multiple GPU Passthrough with a Bounce Buffer (MPT CC) mode. In this mode, up to eight GPUs can be passed through for each Confidential VM (CVM). A bounce buffer stages encrypted data transfers between the GPU device and CVM. GPUs that are part of the same CVM can communicate peer-to-peer over encrypted NVLink connections.
+
+The following are the hardware SKUs that support MPT CC mode:
+
+  - HGX B200, 8-GPU, SXM6 180GB HBM3e, AC
+
+  - HGX B200-850, 8-GPU, SXM6 180GB HBM3e, AC
+
+  - HGX B200, 8-GPU, SXM6 180GB HBM3e, PC New
+
+  - HGX B300, 8-GPU, SXM6 270GB HBM3e, AC New
+
+**Table 3. Component Versions to Enable MPT CC Mode for Blackwell GPUs**
+
+| Component | Version |
+| --- | --- |
+| VBIOS | B200: HGX B200/B300 FW 1.4.X [97.00.E4.00.XX]<br />B300: HGX B200/B300 FW 1.4.X [97.10.64.00.XX]<br />Refer to the [Platform Compatibility Matrix](https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/) for more information about<br />supported platforms, drivers, firmware, and Secure AI modes |
+| Host OS Kernel | Intel : Ubuntu 25.10 / 6.17.0+<br />AMD SEV/SEV-SNP : Ubuntu 25.04 / 6.14+ |
+| Guest OS | Ubuntu 24.04 |
+| `gpu_admin.py` | The main branch is [github.com/nvidia/nvtrust](https://github.com/nvidia/nvtrust).<br />GPU tools - v2025.11.21 |
+| Attestation SDK<br />Local GPU Verifier | Version 2.6.3 or later |
+
+## Known Issues
+
+- The key rotation feature is not supported with PPCIe. A sophisticated attacker with physical or logical superuser access to the system can act as a passive adversary to capture the ciphertext and execute an attempt to break it or the key.
+
+  **Workaround:** Review the [latest research on the effects of extreme AES key usage](https://eprint.iacr.org/2012/438.pdf) and cryptographic wear out to determine your requirements for an attacker advantage. To create a new set of encryption keys in PPCIe mode, you must terminate and launch your CVMs again.
+
+- In systems with multiple GPUs interconnected by NVLink Switch interconnects, the driver registry key `NVreg_RegistryDwords="RmNvswitchGpioDetect=2"` must be used if any of the virtual machines has only a single GPU passed through with CC-mode set to OFF.
+
+  **Workaround:** None.
+
+- With Blackwell CC Modes, the number of decoder sessions is restricted. Because of a software bug, you cannot use more than 190 sessions when a single CUDA context is shared among all decoder sessions or more than 28 sessions when one CUDA context per decoder session is created.
+
+  **Workaround:** None. This issue will be fixed in a future release.
+
+- Performance is degraded with NCCL 2.26.2 and Protected PCIe. Applications might encounter up to 10% slowdown with NCCL 2.26.2.
+
+  **Workaround:** Use NCCL 2.26.3 or a newer version with the fix.
+
+- IV exhaustion crashes the application in PPCIe mode. The H100 CC modes use a 96-bit deterministic IV for each virtual copy engine that is used to transfer data between the GPU and CPU. When this IV space is exhausted, transfers fail to complete.
+
+  **Workaround:** Rotate the keys often in supported modes. If the keys are not rotated often, restart the CVM.
+
+- The GPU-Ready bit is always set when devtools mode is enabled, which may lead to confusion with the requirement to set the GPU-Ready bit when running MPT with devtools mode enabled.
+
+  **Workaround:** When in full CC-on modes, the driver does not accept any workloads until after the Attestation SDK, or the users, manually enable a GPU-Ready bit.
+
+Note: This bit is already enabled in devtools mode.
+
+Users should use best practices by attesting the GPU before performing any work. The GPUs booted in devtools mode are clearly identified, and attestation fails.
+
+- With HGX Hopper firmware 1.6.0, there is an increased risk of the GPU or NVLink Switch falling off the PCIe bus during DC power cycling. This issue was resolved in the 1.7.0 firmware release.
+
+  **Workaround:** Reboot the system to bring the missing devices back on the PCIe bus. To avoid this issue, use HGX Hopper firmware 1.8.0 or newer.
+
+- NVIDIA Performance Primitives (NPP) might not work. NPP uses optimized coding to extract the maximum performance from commonly used transforms and calculations as part of the leverage pinned host memory, which is not supported in CC.

@@ -1,0 +1,84 @@
+---
+title: "R550 TRD1 Release Notes"
+description: "NVIDIA Hopper Confidential Computing R550 TRD1 release notes."
+---
+
+## Overview
+
+The NVIDIA Confidential Computing (CC) features of the NVIDIA H100 Tensor Core GPUs have been formally released in this general access (GA) release.
+
+The GA release consists of the CUDA Toolkit version 12.4 paired with Tesla Recommended Driver version r550.54.15.
+
+This GA software release features a complete software stack that targets a NVIDIA H100 GPU in passthrough mode with a session key for encryption and authentication and basic use of the Developer Tools. The code and data will be confidential up to the limits of the [NIST SP800-38D AES-GCM standard](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf), and after this point, the VM needs to be restarted.
+
+Before deploying workloads, NVIDIA recommends that users invoke good practices, such as performing regular attestation.
+
+## New Features
+
+The GA release of Hopper Confidential Computing (HCC) is now available!
+
+Protect your AI models, weights, and inputs while they are being processed. Your CUDA workload should be lift-and-shift into CC modes, which provides complete encryption/signing of data and code, non-repeating, deterministic IVs, and otherwise complete isolation from prying eyes.
+
+## Limitations
+
+- CUDA APIs which utilize pinned host memory are not supported. In the current generation of CC systems, CPU architectures do not allow external entities to access VM memory, and IO devices, such as GPUs, are not allowed to directly access Guest VM memory. Using Unified Virtual Memory will transparently allow applications to operate.
+
+- CUDA limits the total number of concurrent CUDA contexts to 18. In CC mode (SPT), there is a system-wide limit on the number of secure Copy Engine channels.
+
+- Graphic applications are not supported in CC modes. Hopper CC is targeted towards compute-centric workloads, so graphical interop modes/applications are not supported.
+
+- Developer Tools supports profiling only.
+
+  - Nsys CUDA Trace, CUPTI APIs, and GPU Crash Dump are supported.
+
+  - Debugging, for example `cuda-gdb`, modes are not supported.
+
+- Only one GPU per VM is allowed. Multiple GPUs assigned to a VM will produce undefined behavior.
+
+- Video performance placeholder. Video performance that uses small resolutions might have performance reductions.
+
+- Certain CUDA samples are not supported. Due to the the samples that use pinned host memory, or are video applications, the following samples will not run on Hopper CC modes:
+
+  - `convolutionTexture`
+
+  - `cudaNvSci`
+
+  - `dct8x8`
+
+  - `lineOfSight`
+
+  - `simpleCubemapTexture`
+
+  - `simpleIPC`
+
+  - `simpleLayeredTexture`
+
+  - `simplePitchLinearTexture`
+
+  - `simpleStream`
+
+  - `simpleTexture`
+
+  - `simpleTextureDrv`
+
+  - `watershedSegmentationNPP`
+
+## Known Issues
+
+- A key rotation feature is missing. A sophisticated attacker with physical,or logical superuser, access to the system might be able to act as a passive adversary to capture the ciphertext and execute an attempt to break the ciphertext or the key.
+
+  **Workaround:** Users should review the [latest research on the effects of extreme usage of AES keys](https://eprint.iacr.org/2012/438.pdf) and the cryptographic wear-out to determine their requirements for an attacker advantage. Users will need to terminate and relaunch their CVMs to create a new set of encryption keys.
+
+- IV exhaustion will crash the application. The H100 CC modes use a 96-bit deterministic IV for each virtual copy engine used to transfer data between the GPU and CPU. At the exhaustion of this IV space, transfers will fail to complete.
+
+  **Workaround:** CVM must be restarted.
+
+- GPU-Ready bit is set when “devtools” mode is enabled.
+
+  **Workaround:** When in full “CC-on” modes, the driver will not accept any workloads until the Attestation SDK, or users, manually enable a “GPU-Ready” bit. Devtools mode will automatically have this bit enabled.
+
+Users should use best practices by attesting the GPU before performing any work. The GPUs booted in devtools mode will be clearly identified, and the attestation will fail.
+
+- NVIDIA Performance Primitives (NPP) might not work.
+
+  **Workaround:** NPP uses optimized coding to extract maximum performance from commonly used transforms/calculations. Part of these leverage pinned host memory, which is unsupported in CC.

@@ -13,6 +13,36 @@ navigation:
       - page: Overview
         path: ../../pages/overview/overview.mdx
         slug: overview
+      - page: Release Notes
+        path: ../../pages/overview/release-notes.mdx
+        slug: release-notes
+
+  - section: Release Notes
+    slug: release-notes
+    # Register the release pages without adding a sidebar section.
+    hidden: true
+    contents:
+      - page: R595 TRD1
+        path: ../../pages/release-notes/r595-trd1.mdx
+        slug: r595-trd1
+      - page: R590 TRD1
+        path: ../../pages/release-notes/r590-trd1.mdx
+        slug: r590-trd1
+      - page: R580 TRD1
+        path: ../../pages/release-notes/r580-trd1.mdx
+        slug: r580-trd1
+      - page: R575 TRD1
+        path: ../../pages/release-notes/r575-trd1.mdx
+        slug: r575-trd1
+      - page: R570 TRD1
+        path: ../../pages/release-notes/r570-trd1.mdx
+        slug: r570-trd1
+      - page: R550 TRD3
+        path: ../../pages/release-notes/r550-trd3.mdx
+        slug: r550-trd3
+      - page: R550 TRD1
+        path: ../../pages/release-notes/r550-trd1.mdx
+        slug: r550-trd1
 
   - section: Deployment Modalities
     slug: ""
