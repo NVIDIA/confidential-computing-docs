@@ -1,0 +1,138 @@
+---
+title: "R550 TRD3 Release Notes"
+description: "NVIDIA Trusted Computing Solutions R550 TRD3 release notes."
+---
+
+## Overview
+
+The NVIDIA Trusted Computing features of the NVIDIA H100 Tensor Core GPUs have updates and new features in this GA release.
+
+This release consists of the CUDA Toolkit version 12.4 that is paired with NVIDIA Data Center GPU Drivers version 550.54.15.
+
+This software release features a complete software stack that targets an NVIDIA H100 GPU in passthrough mode with a session key for encryption and authentication and basic use of the developer tools. The code and data will be confidential up to the limits of the [NIST SP800-38D AES-GCM standard](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf), and after this point, the VM needs to be restarted.
+
+Before deploying workloads, NVIDIA recommends that users invoke good practices, such as performing regular attestations.
+
+## New Features
+
+Early Access (EA) of Protected PCIe is enabled in this release. Supported in an 8-way HGX system, NVLinks will now be enabled to increase
+
+Key Rotation details
+
+## Limitations
+
+This section provides a list of the known limitations in this release.
+
+### Full Confidential Computing Mode
+
+- If users want to adhere to true CC requirements, only one GPU per VM is allowed. Multiple GPUs that are assigned to a VM to modes other than PPCI, will produce undefined behavior.
+
+- CUDA limits the total number of concurrent CUDA contexts to 18. In CC mode (SPT), there is a system-wide limit on the number of secure Copy Engine channels.
+
+- Developer Tools supports profiling only.
+
+  - Nsys CUDA Trace, CUPTI APIs, and GPU Crash Dump are supported.
+
+  - Debugging, for example `cuda-gdb`, modes are not supported.
+
+- Video performance placeholder.
+
+  - Video performance that uses small resolutions might have performance reductions.
+
+  - Due to the system-wide limit on the secure Copy Engine channels, the number of concurrent video decode sessions is limited to approximately 89.
+
+### HGX Protected PCIe Mode
+
+Peer-to-peer copies using CUDA APIs, for example `cudaMemcpyAsync`, are only supported when peer access is enabled between the source and destination devices using `cudaDeviceEnablePeerAccess` or `cuCtxEnablePeerAccess`.
+
+### Confidential Computing and Protected PCIe Modes
+
+- CUDA APIs that use pinned host memory are not supported. In the current generation of CC systems, CPU architectures do not allow external entities to access VM memory, and IO devices, such as GPUs, are not allowed to directly access Guest VM memory. To transparently allow applications to operate, use Unified Virtual Memory.
+
+- Graphic applications are not supported in CC modes. Hopper CC is targeted towards compute-centric workloads, so graphical interop modes/applications are not supported.
+
+- Ready STate 010 Generic topic wording on 010 bullet.
+
+- Attestation software run as root will auto-set ready Lorem Ipsum wordign on attestation Softwrae running
+
+- Graphic applications are not supported in CC modes. Hopper CC is targeted towards compute-centric workloads, so graphical interop modes/applications are not supported.
+
+- Certain CUDA samples are not supported. Due to the the samples that use pinned host memory, or are video applications, the following samples will not run on Hopper CC modes:
+
+  - `convolutionTexture`
+
+  - `cudaNvSci`
+
+  - `dct8x8`
+
+  - `lineOfSight`
+
+  - `simpleCubemapTexture`
+
+  - `simpleIPC`
+
+  - `simpleLayeredTexture`
+
+  - `simplePitchLinearTexture`
+
+  - `simpleStream`
+
+  - `simpleTexture`
+
+  - `simpleTextureDrv`
+
+  - `watershedSegmentationNPP`
+
+- Certain CUDA APIs are unsupported.
+
+  - `cudaHostRegister` and `cudaHostUnregister` return `cudaErrorNotSupported` in HCC mode.
+
+  - Host Memory Registration is not supported in CC mode. CUDA programs are expected to query `cudaDevAttrHostRegisterSupported` before invoking the `cudaHostRegister` API.
+
+  - The CUDA UMD shall return zero value for the following device attributes in HCC mode:
+
+    - `cudaDevAttrHostRegisterSupported`
+
+    - `cudaDevAttrCanUseHostPointerForRegisteredMem` and `CU_DEVICE_ATTRIBUTE_CAN_USE_HOST_POINTER_FOR_REGISTERED_MEM`
+
+    - `cudaDevAttrHostRegisterReadOnlySupported` and `CU_DEVICE_ATTRIBUTE_READ_ONLY_HOST_REGISTER_SUPPORTED`
+
+- GPUDirect RDMA is not supported in CC mode. The CUDA UMD returns a zero value for the `cudaDevAttrGPUDirectRDMASupported` device attribute and `CU_DEVICE_ATTRIBUTE_GPU_DIRECT_RDMA_SUPPORTED` in HCC mode.
+
+- `CUArray` types used in CUDA Memcpy APIs are allowed only in HCC mode when the source and the destination addresses are on the same local GPU device. Host-to-Array and Array-to-Host copies are not supported because of the potential to require a conversion between pitch-linear and block-linear access patterns of the `CUArray` memory type during the secure copy operation.
+
+**Table 1. Memcopy API behaviour on CUDA Arrays in HCC Mode**
+
+| API | Behavior in CC mode |
+| --- | --- |
+| `cuMemcpyHToA(Async)`<br />`cuMemcpyAToH(Async)`<br />`cudaMemcpy2DToArray(Async)`<br />`cudaMemcpy2DFromArray(Async)` | Returns `CUDA_ERROR_NOT_SUPPORTED`. |
+| `cudaMemcpy3D(Async)` | When `srcArray` or `dstArray` is passed into `cudaMemcpy3DParms`, the API returns `CUDA_ERROR_NOT_SUPPORTED`. |
+| `cuMemcpy2D(Async)`<br />`cuMemcpy2DUnaligned()`<br />`cuMemcpy3D(Async)` | The following combinations in the `pCopy` parameter return `CUDA_ERROR_NOT_SUPPORTED`:<br />`srcMemoryType == CU_MEMORYTYPE_HOST` and `dstMemoryType == CU_MEMORYTYPE_ARRAY`<br />`srcMemoryType == CU_MEMORYTYPE_ARRAY` and `dstMemoryType == CU_MEMORYTYPE_HOST` |
+
+The `kind` parameter that is accepted by some of the above memory copy APIs do not change the API behavior regarding array copies. Passing CUDA arrays into the CUDA memory copy APIs with `kind` set to any value might lead to undefined behavior.
+
+Memset APIs on 2D and 3D arrays are supported in HCC mode because these APIs use GPU kernels to initialize a `CUArray` in device memory. Since the device memory that is mapped under the CUDA UMD belongs to CPR in the HCC mode, these operations are not changed from the non-CC mode implementation.
+
+## Known Issues
+
+- A key rotation feature is missing. A sophisticated attacker with physical,or logical superuser, access to the system might be able to act as a passive adversary to capture the ciphertext and execute an attempt to break the ciphertext or the key.
+
+  **Workaround:** Users should review the [latest research on the effects of extreme usage of AES keys](https://eprint.iacr.org/2012/438.pdf) and the cryptographic wear out to determine their requirements for an attacker advantage. To create a new set of encryption keys, users must terminate and relaunch their CVMs.
+
+- IV exhaustion will crash the application. The H100 CC modes use a 96-bit deterministic IV for each virtual copy engine used to transfer data between the GPU and CPU. When this IV space is exhausted, transfers will fail to complete.
+
+  **Workaround:** CVM must be restarted.
+
+- GPU-Ready bit is set when devtools mode is enabled.
+
+  **Workaround:** When in full CC-on modes, the driver will not accept any workloads until the Attestation SDK, or users, manually enable a GPU-Ready bit. Devtools mode will automatically have this bit enabled.
+
+Users should use best practices by attesting the GPU before performing any work. The GPUs booted in devtools mode will be clearly identified, and the attestation will fail.
+
+- NVIDIA Performance Primitives (NPP) might not work.
+
+  **Workaround:** NPP uses optimized coding to extract maximum performance from commonly used transforms/calculations. Part of these leverage pinned host memory, which is unsupported in CC.
+
+- In Protected PCIe mode, when the source or destination operand are imported GPU memory allocations on a device that is not visible to the process, the host-to-device or device-to-host copies might fail asynchronously with `cudaErrorLaunchFailure`.
+
+- In Protected PCIe mode, using `cooperative_groups::multi_grid_group::sync` in kernels launched with `cudaLaunchCooperativeKernelMultiDevice` results in the kernel failing with `cudaErrorIllegalAddress`.
