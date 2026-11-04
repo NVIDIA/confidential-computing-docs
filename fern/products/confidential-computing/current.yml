@@ -13,6 +13,9 @@ navigation:
       - page: Overview
         path: ../../pages/overview/overview.mdx
         slug: overview
+      - page: Platform Compatibility Matrix
+        path: ../../pages/overview/compatibility-matrix.mdx
+        slug: compatibility-matrix
 
   - section: Deployment Modalities
     slug: ""
@@ -32,8 +35,6 @@ navigation:
     contents:
       - link: Attestation
         href: https://docs.nvidia.com/attestation/#overview
-      - link: Platform Compatibility Matrix
-        href: https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/
       - link: Attestation SDK
         href: https://github.com/nvidia/attestation-sdk
       - page: Licensing

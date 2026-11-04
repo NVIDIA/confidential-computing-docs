@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Validate compatibility matrix
+
+on:
+  pull_request:
+    paths:
+      - 'fern/data/compatibility/**'
+      - 'fern/scripts/compatibility-matrix.js'
+      - 'scripts/compatibility-matrix.template.js'
+      - 'scripts/generate-compatibility-matrix.py'
+      - '.github/workflows/compatibility-matrix.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/generate-compatibility-matrix.py --check

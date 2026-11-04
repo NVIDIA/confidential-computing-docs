@@ -111,3 +111,27 @@ Use your real name (sorry, no pseudonyms or anonymous contributions.)
 
 If you set your `user.name` and `user.email` git configs, you can sign your
 commit automatically with `git commit -s`.
+
+## Platform Compatibility Matrix
+
+The CSV files in `fern/data/compatibility/` are the source of truth for the
+shared compatibility matrix. Keep one row per supported combination. Treat
+all values, including VBIOS and CUDA driver versions, as text. Preserve the
+CSV headers and use standard CSV quoting for descriptions containing commas.
+
+After changing the CSV files or `scripts/compatibility-matrix.template.js`, validate
+the data, regenerate the widget, and commit the updated output by running:
+
+```console
+$ python3 scripts/generate-compatibility-matrix.py
+```
+
+The script validates required fields and duplicate rows before regenerating the
+widget. CI checks that the generated widget is up to date. The matrix applies across deployment
+modalities and is maintained independently of product release snapshots.
+
+The initial CSV data was imported on 2026-11-04 from the former public
+Secure AI Compatibility Matrix. The CSV files are now maintained in this
+repository; generation does not fetch or synchronize the former website.
+When adding a GPU family, add its CSV download to
+`fern/pages/overview/compatibility-matrix.mdx` as well.
