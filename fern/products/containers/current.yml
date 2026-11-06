@@ -4,13 +4,13 @@
 navigation:
   - page: Overview
     path: ../../pages/containers/index.mdx
-    slug: ""
+    slug: overview
   - section: Learn
     skip-slug: true
     contents:
       - page: Reference Architecture
         path: ../../pages/containers/overview.mdx
-        slug: overview
+        slug: reference-architecture
       - page: Personas
         path: ../../pages/containers/personas.mdx
         slug: personas
