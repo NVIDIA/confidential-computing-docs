@@ -13,6 +13,9 @@ navigation:
       - page: Overview
         path: ../../pages/overview/overview.mdx
         slug: overview
+      - page: Operations Guide
+        path: ../../pages/overview/operations-guide.mdx
+        slug: operations-guide
       - page: Release Notes
         path: ../../pages/overview/release-notes.mdx
         slug: release-notes
