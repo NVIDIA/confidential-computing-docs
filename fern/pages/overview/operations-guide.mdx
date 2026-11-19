@@ -4,7 +4,7 @@ description: "Deployment tips and CUDA application development considerations fo
 ---
 
 This guide provides instructions, recommendations, and cautions for the initial deployment of an NVIDIA Confidential Computing solution.
-It also provides considerations for developing applications for an NVIDIA Confidential Computing solution.
+The guide also provides considerations for developing applications for an NVIDIA Confidential Computing solution.
 
 ## Deployment Tips
 
@@ -16,32 +16,32 @@ To ensure compatibility, check your infrastructure against the [Platform Compati
 ### Ensure that Persistence Mode Is On
 
 In a typical operation, when the NVIDIA device resources are no longer being used, the NVIDIA kernel driver tears down the device state.
-However, in CC mode, this behavior causes the shared secret and the shared keys that were established during the SPDM setup phase of the driver to be destroyed.
-To protect user data, the GPU does not allow the establishment of an SPDM session to be restarted without a function-level reset (FLR).
+However, in CC mode, this teardown destroys the shared secret and the shared keys that the driver established during the SPDM setup phase.
+To protect user data, the GPU does not allow the driver to restart SPDM session establishment without a function-level reset (FLR).
 An FLR resets and scrubs the GPU.
 
 The `nvidia-persistenced` daemon provides the persistence mode configuration option.
 NVIDIA management software, such as `nvidia-smi`, can set the persistence mode configuration option.
-When persistence mode is on, the NVIDIA kernel driver is prevented from exiting.
+Persistence mode prevents the NVIDIA kernel driver from exiting.
 The `nvidia-persistenced` daemon does not use any device resources.
 The daemon merely sleeps while maintaining a reference to the NVIDIA device state.
 
 ### Do Not Disable the GPU Ready-State
 
 The driver sets the GPU ready-state to track whether the infrastructure has passed attestation requirements.
-If the ready-state is set to `0` after attestation, the driver fails to load.
-The only way to recover from this condition is to reset the entire virtual machine.
+If you set the ready-state to `0` after attestation, the driver fails to load.
+To recover from this condition, you must reset the entire virtual machine.
 
 ### Do Not Install the GPU Driver on the Host
 
-Typically, the GPU is bound to a stub driver.
+Typically, the host binds the GPU to a stub driver.
 The stub driver hides the GPU from the host OS and makes the GPU available for passthrough.
 If you install the GPU driver on the host and the host binds to that GPU, the GPU is not available for passthrough to the guest, because the host driver controls the GPU.
 
-### Ensure that the Host Has Twice as Much Memory as Can Be Allocated to VMs
+### Ensure that the Host Has Twice as Much Memory as You Can Allocate to VMs
 
-An issue with QEMU in versions 10.1 and lower requires the host to have twice as much memory as can be allocated to VMs.
-QEMU 10.1 has a fix for the issue, but this fix is natively available only starting with Ubuntu 25.10.
+An issue with QEMU in versions 10.1 and lower requires the host to have twice as much memory as you can allocate to VMs.
+QEMU 10.1 has a fix for the issue, but only Ubuntu 25.10 and later include the fix natively.
 
 ### Use OpenSSL 3.5.0 or Newer
 
@@ -55,11 +55,11 @@ NVIDIA Confidential Computing does not support some CUDA API features.
 Some limitations arise because confidential computing is inherently incompatible with certain CUDA constructs.
 For example:
 
-- Memory handles cannot be propagated beyond the scope of a Trusted Compute Boundary (TCB).
+- You cannot propagate memory handles beyond the scope of a Trusted Compute Boundary (TCB).
 - Firewalls in CC mode block developer tools such as NVIDIA Nsight Systems.
 
 Some limitations are implementation specific.
-For example, in SPT CC mode, no more than one GPU can be passed through to a CVM.
+For example, in SPT CC mode, you can pass through only one GPU to a CVM.
 
 The following sections summarize CUDA API support for the Single GPU Passthrough (SPT) and Protected PCIe (PPCIe) CC modes.
 
@@ -74,8 +74,8 @@ The following sections summarize CUDA API support for the Single GPU Passthrough
 
 | API | SPT | PPCIe |
 | --- | --- | --- |
-| [Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html):<br />`cudaMemcpyAsync`<br />`cudaMemcpy2D`<br />`cudaMemcpy2DAsync`<br />`cudaMemcpy3D`<br />`cudaMemcpy3DAsync`<br />`cudaMemcpy3DBatchAsync`<br />`cudaMemcpyBatchAsync`<br />`cudaMemcpyFromSymbol`<br />`cudaMemcpyFromSymbolAsync`<br />`cudaMemcpyToSymbol`<br />`cudaMemcpyToSymbolAsync` | Non-block-linear memcopy supported. | Non-block-linear memcopy supported.<br />Peer-to-peer copies using CUDA APIs (for example, `cudaMemcpyAsync`) are supported if peer access is successfully enabled between the source and destination devices using `cudaDeviceEnablePeerAccess` or `cuCtxEnablePeerAccess`.<br />Peer-to-host-to-peer copies are not supported, and APIs that fall back to these copies fail. |
-| [Driver API](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__MEM.html):<br />`cuMemcpyAsync`<br />`cuMemcpy2D`<br />`cuMemcpy2DAsync`<br />`cuMemcpy3D`<br />`cuMemcpy3DAsync`<br />`cuMemcpy3DBatchAsync`<br />`cuMemcpyBatchAsync`<br />`cuMemcpy2DUnaligned`<br />`cuMemcpyDtoD`<br />`cuMemcpyDtoDAsync`<br />`cuMemcpyDtoH`<br />`cuMemcpyDtoHAsync`<br />`cuMemcpyHtoD`<br />`cuMemcpyHtoDAsync` | Non-block-linear memcopy supported. | Non-block-linear memcopy supported.<br />Peer-to-peer copies using CUDA APIs (for example, `cudaMemcpyAsync`) are supported if peer access is successfully enabled between the source and destination devices using `cudaDeviceEnablePeerAccess` or `cuCtxEnablePeerAccess`.<br />Peer-to-host-to-peer copies are not supported, and APIs that fall back to these copies fail. |
+| [Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html):<br />`cudaMemcpyAsync`<br />`cudaMemcpy2D`<br />`cudaMemcpy2DAsync`<br />`cudaMemcpy3D`<br />`cudaMemcpy3DAsync`<br />`cudaMemcpy3DBatchAsync`<br />`cudaMemcpyBatchAsync`<br />`cudaMemcpyFromSymbol`<br />`cudaMemcpyFromSymbolAsync`<br />`cudaMemcpyToSymbol`<br />`cudaMemcpyToSymbolAsync` | Non-block-linear memcopy supported. | Non-block-linear memcopy supported.<br />CUDA APIs, such as `cudaMemcpyAsync`, support peer-to-peer copies if you enable peer access between the source and destination devices by using `cudaDeviceEnablePeerAccess` or `cuCtxEnablePeerAccess`.<br />CUDA does not support peer-to-host-to-peer copies, and APIs that fall back to peer-to-host-to-peer copies fail. |
+| [Driver API](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__MEM.html):<br />`cuMemcpyAsync`<br />`cuMemcpy2D`<br />`cuMemcpy2DAsync`<br />`cuMemcpy3D`<br />`cuMemcpy3DAsync`<br />`cuMemcpy3DBatchAsync`<br />`cuMemcpyBatchAsync`<br />`cuMemcpy2DUnaligned`<br />`cuMemcpyDtoD`<br />`cuMemcpyDtoDAsync`<br />`cuMemcpyDtoH`<br />`cuMemcpyDtoHAsync`<br />`cuMemcpyHtoD`<br />`cuMemcpyHtoDAsync` | Non-block-linear memcopy supported. | Non-block-linear memcopy supported.<br />CUDA APIs, such as `cudaMemcpyAsync`, support peer-to-peer copies if you enable peer access between the source and destination devices by using `cudaDeviceEnablePeerAccess` or `cuCtxEnablePeerAccess`.<br />CUDA does not support peer-to-host-to-peer copies, and APIs that fall back to peer-to-host-to-peer copies fail. |
 | [Runtime API](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html):<br />`cudaMemcpy3DPeer`<br />`cudaMemcpy3DPeerAsync`<br />`cudaMemcpyPeer`<br />`cudaMemcpyPeerAsync` | Returns `CUDA_ERROR_NOT_SUPPORTED` | Returns `CUDA_ERROR_NOT_SUPPORTED` |
 | [Driver API](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__MEM.html):<br />`cuMemBatchDecompressAsync`<br />`cuMemcpy3DPeer`<br />`cuMemcpy3DPeerAsync`<br />`cuMemcpyPeer`<br />`cuMemcpyPeerAsync` | Returns `CUDA_ERROR_NOT_SUPPORTED` | Returns `CUDA_ERROR_NOT_SUPPORTED` |
 
@@ -152,7 +152,7 @@ The following sections summarize CUDA API support for the Single GPU Passthrough
 
 | API | PPCIe |
 | --- | --- |
-| Driver API:<br />[`cuPointerGetAttribute`](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__UNIFIED.html#group__CUDA__UNIFIED_1g0c28ed0aff848042bc0533110e45820c) | Calling this API with pointers allocated by using `cudaMallocHost` returns one of the following values:<br />`CU_MEMORYTYPE_DEVICE` for `CU_POINTER_ATTRIBUTE_MEMORY_TYPE`<br />`1` for `CU_POINTER_ATTRIBUTE_IS_MANAGED`<br />`CUDA_ERROR_INVALID_DEVICE` for `CU_POINTER_ATTRIBUTE_P2P_TOKENS`<br />`1` for `CU_POINTER_ATTRIBUTE_SYNC_MEMOPS` |
+| Driver API:<br />[`cuPointerGetAttribute`](https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__UNIFIED.html#group__CUDA__UNIFIED_1g0c28ed0aff848042bc0533110e45820c) | Calling `cuPointerGetAttribute` with pointers that `cudaMallocHost` allocates returns one of the following values:<br />`CU_MEMORYTYPE_DEVICE` for `CU_POINTER_ATTRIBUTE_MEMORY_TYPE`<br />`1` for `CU_POINTER_ATTRIBUTE_IS_MANAGED`<br />`CUDA_ERROR_INVALID_DEVICE` for `CU_POINTER_ATTRIBUTE_P2P_TOKENS`<br />`1` for `CU_POINTER_ATTRIBUTE_SYNC_MEMOPS` |
 
 ### Virtual Memory Management
 
