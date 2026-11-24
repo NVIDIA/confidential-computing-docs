@@ -5,6 +5,16 @@ description: "Protect workloads and data in use on NVIDIA infrastructure."
 layout: custom
 ---
 
+<style>{`
+  .cc-landing { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+  .cc-hero { padding: 4rem 0 2.5rem; text-align: center; }
+  .cc-eyebrow { margin: 0 0 0.75rem; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-11); }
+  .cc-hero h1 { margin: 0; font-size: clamp(1.875rem, 3.5vw, 2.5rem); line-height: 1.2; font-weight: 600; }
+  .cc-lede { max-width: 640px; margin: 1rem auto 0; font-size: 1.125rem; line-height: 1.6; opacity: 0.75; }
+  .cc-products { margin-bottom: 3.5rem; }
+  .cc-landing h2 { margin: 2.5rem 0 1rem; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+`}</style>
+
 <div className="cc-landing">
 
 <div className="cc-hero">
@@ -22,7 +32,7 @@ layout: custom
   <Card title="Confidential Computing Overview" icon="fa-solid fa-shield-halved" href="/confidential-computing/overview">
     Compare use cases, deployment modalities, trust boundaries, and shared security capabilities.
 
-    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+    <Markdown src="/pages/shared/snippets/card-action.mdx" />
   </Card>
 </Cards>
 
@@ -38,17 +48,17 @@ layout: custom
   <Card title="Platform Compatibility Matrix" icon="fa-solid fa-table-cells" href="https://www.nvidia.com/en-us/data-center/solutions/confidential-computing/secure-ai-compatibility-matrix/">
     Review supported GPUs, CPUs, drivers, and software versions.
 
-    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+    <Markdown src="/pages/shared/snippets/card-action.mdx" />
   </Card>
   <Card title="Attestation" icon="fa-solid fa-fingerprint" href="https://docs.nvidia.com/attestation/#overview">
     Learn how workloads verify NVIDIA hardware and security configuration before releasing secrets.
 
-    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+    <Markdown src="/pages/shared/snippets/card-action.mdx" />
   </Card>
   <Card title="Attestation SDK" icon="fa-solid fa-circle-check" href="https://github.com/nvidia/attestation-sdk">
     Access resources for implementing and validating trusted computing on NVIDIA hardware.
 
-    <span className="cc-card-action"><span className="cc-card-action-label">Learn more</span></span>
+    <Markdown src="/pages/shared/snippets/card-action.mdx" />
   </Card>
 </Cards>
 
